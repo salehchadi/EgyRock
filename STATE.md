@@ -2,10 +2,9 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 6 — Homepage (COMPLETED)
-- **Next Phase**: Phase 7 — Product catalog & stock status
-- **Status**: READY FOR PHASE 7
-- **Last Updated**: 2026-09-14 17:05 (Phase 6 completed & verified)
+- **Active Phase**: Phase 8 — Cart
+- **Status**: NOT STARTED
+- **Last Updated**: 2026-09-14 17:18 (Phase 7 completed)
 
 ---
 
@@ -81,7 +80,17 @@
   - [x] Cairo Underground aesthetic applied across sections with diagonal screen-print texture, high-contrast borders, and rock poster typography
   - [x] RTL mirroring and Arabic typography verified when accessing `/ar`
   - [x] Live data reflection verified via `scripts/verify-homepage.ts`: verified category renaming in database reflects without code changes
-- [ ] **Phase 7 — Product catalog & stock status**
+- [x] **Phase 7 — Product catalog & stock status**
+  - [x] Product listing page (`src/app/[locale]/catalog/page.tsx`) with category filter bar and grid layout
+  - [x] `ProductCard` component with localized name/desc, stock badge, price, and dimmed out-of-stock styling
+  - [x] `CategoryFilter` client component with dynamic category buttons from DAL
+  - [x] `AddToCartButton` client component with quantity selector and localStorage cart (does NOT decrement stock)
+  - [x] Product detail page (`src/app/[locale]/catalog/[id]/page.tsx`) with image gallery, breadcrumb, localized content, shipping/InstaPay callout, and related products
+  - [x] `ProductImageGallery` client component with main image, prev/next arrows, thumbnail strip, RTL support
+  - [x] Stock-status utility (`src/lib/stock.ts`) as single shared function: quantity 0 → out_of_stock, ≤5 → countdown, >5 → in_stock
+  - [x] Verification script (`scripts/verify-stock.ts`) — all 9 test cases passed
+  - [x] Production build (`npm run build`) passed with 0 TypeScript errors
+  - [x] ESLint passed (0 errors, 2 pre-existing warnings in `lib/data/`)
 - [ ] **Phase 8 — Cart**
 - [ ] **Phase 9 — Checkout & manual InstaPay flow**
 - [ ] **Phase 10 — Admin panel**
