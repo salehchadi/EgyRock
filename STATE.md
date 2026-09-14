@@ -2,10 +2,10 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 3 — Internationalization & RTL scaffolding (COMPLETED)
-- **Next Phase**: Phase 4 — Data access layer (Google Sheets)
-- **Status**: READY FOR PHASE 4
-- **Last Updated**: 2026-09-14 15:57 (Phase 3 completed & verified)
+- **Active Phase**: Phase 5 — Authentication (COMPLETED)
+- **Next Phase**: Phase 6 — Homepage
+- **Status**: READY FOR PHASE 6
+- **Last Updated**: 2026-09-14 17:02 (Phase 5 completed & verified)
 
 ---
 
@@ -46,8 +46,34 @@
   - [x] Localized homepage (`src/app/[locale]/page.tsx`) built and tested in all 3 locales
   - [x] Verified: `GET /` redirects to `/en`, `GET /ar` renders `dir="rtl"` with Arabic display typography and translations, `GET /fr` renders French
   - [x] Production build (`npm run build`) and ESLint verified
-- [ ] **Phase 4 — Data access layer (Google Sheets)**
-- [ ] **Phase 5 — Authentication**
+- [x] **Phase 4 — Data access layer (Google Sheets)**
+  - [x] Google Sheets connection client (`lib/data/sheetsClient.ts`) created with rate-limiting and retry wrappers
+  - [x] Sheet initialization script (`scripts/init-sheets.ts`) created to set up tabs with proper headers
+  - [x] Data access layer modules created for all entities:
+    - [x] `lib/data/products.ts` - CRUD operations + stock decrement
+    - [x] `lib/data/categories.ts` - CRUD operations
+    - [x] `lib/data/orders.ts` - CRUD operations + status management
+    - [x] `lib/data/users.ts` - CRUD operations + email validation
+    - [x] `lib/data/homepageImages.ts` - CRUD operations + sorting
+    - [x] `lib/data/translations.ts` - CRUD operations + locale filtering
+    - [x] `lib/data/pages.ts` - CRUD operations + slug validation
+  - [x] TypeScript types defined in `lib/types/index.ts` for all entities
+  - [x] Seed script (`scripts/seed.ts`) created with sample products, categories, homepage images, translations, and admin user
+  - [x] Test script (`scripts/test-dal.ts`) created to verify DAL structure
+  - [x] Test API route (`src/app/api/test-connection/route.ts`) created for end-to-end verification
+  - [x] Production build (`npm run build`) passed with 0 TypeScript errors
+  - [x] DAL structure test passed: all 8 modules verified with correct exports
+- [x] **Phase 5 — Authentication**
+  - [x] NextAuth.js credentials-based authentication implemented with bcrypt password hashing
+  - [x] Two roles supported: `customer` and `admin` backed by the Users data access layer
+  - [x] Custom localized login page (`src/app/[locale]/auth/login/page.tsx`) styled with Cairo Underground aesthetics, error feedback, and Suspense boundary
+  - [x] Custom localized registration page (`src/app/[locale]/auth/register/page.tsx`) with auto-sign-in flow
+  - [x] NextAuth `AuthProvider` session wrapper integrated into locale root layout
+  - [x] User Account page (`src/app/[locale]/account/page.tsx`) displaying email, name, role stamp, sign-out button, and order history placeholder
+  - [x] Protected Admin Control Center (`src/app/[locale]/admin/page.tsx`) strictly enforcing `role === "admin"`
+  - [x] Next.js middleware guarding `/admin` routes (redirects unauthenticated users to login with `callbackUrl`, redirects non-admin authenticated accounts to account)
+  - [x] Header updated with dynamic user session indicators and Admin badge
+  - [x] Verification completed: tested unauthenticated redirection (`307` to login), tested role separation matrix via `verify-auth.ts`, and confirmed non-admins are blocked from `/admin`
 - [ ] **Phase 6 — Homepage**
 - [ ] **Phase 7 — Product catalog & stock status**
 - [ ] **Phase 8 — Cart**

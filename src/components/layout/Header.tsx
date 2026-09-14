@@ -5,7 +5,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
+import { useSession } from "next-auth/react";
+
 export function Header() {
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const t = useTranslations("nav");
   const brandT = useTranslations("brand");
   const locale = useLocale();
@@ -79,6 +83,34 @@ export function Header() {
           {/* Right Action Area (Locale Switcher, Account, Cart) */}
           <div className="flex items-center gap-3 sm:gap-4">
             <LocaleSwitcher />
+
+            {/* Account / Auth link */}
+            {session?.user ? (
+              <div className="flex items-center gap-2">
+                {user?.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="hidden sm:inline-block px-2.5 py-1 bg-[#e0562c] text-white text-xs font-heading uppercase tracking-wider shadow-[2px_2px_0px_black] hover:bg-[#c44721] transition"
+                  >
+                    ADMIN
+                  </Link>
+                )}
+                <Link
+                  href="/account"
+                  className="px-3 py-1.5 border border-[#3f3b35] bg-[#282521] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] transition flex items-center gap-1.5"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#2ea043]" />
+                  <span className="max-w-[100px] truncate">{user.name || "Account"}</span>
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] hover:text-[#e0562c] transition"
+              >
+                {isArabic ? "دخول" : "SIGN IN"}
+              </Link>
+            )}
 
             {/* Cart Icon / Trigger */}
             <Link
