@@ -1,0 +1,52 @@
+{
+  "brand": {
+    "name": "EgyRock",
+    "tagline": "Musique et Streetwear Underground du Caire"
+  },
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "courses": "Formations Physiques",
+    "tshirts": "T-Shirts",
+    "mugs": "Mugs",
+    "accessories": "Accessoires",
+    "styleGuide": "Guide de Style",
+    "account": "Mon Compte",
+    "cart": "Panier",
+    "admin": "Administration"
+  },
+  "hero": {
+    "badge": "Lancement Underground #04",
+    "title": "DISTORSION AU CŒUR DU CAIRE",
+    "subtitle": "Merch rock sérigraphié, coffrets d'apprentissage physique de guitare et streetwear égyptien haut de gamme.",
+    "ctaShop": "Découvrir la Collection",
+    "ctaCourses": "Explorer les Formations"
+  },
+  "categories": {
+    "title": "Acheter par Catégorie",
+    "subtitle": "Articles physiques expédiés dans toute l'Égypte",
+    "courses": "Formations",
+    "coursesDesc": "Kits de cours physiques en boîte et manuels de guitare",
+    "tshirts": "T-Shirts",
+    "tshirtsDesc": "Vêtements rock sérigraphiés haute densité",
+    "mugs": "Mugs",
+    "mugsDesc": "Mugs en céramique style affiches de concert",
+    "accessories": "Accessoires",
+    "accessoriesDesc": "Médiators de guitare, badges, pin's et casquettes"
+  },
+  "stock": {
+    "inStock": "En Stock",
+    "onlyLeft": "Plus que {count} restants",
+    "outOfStock": "Rupture de Stock"
+  },
+  "actions": {
+    "addToCart": "Ajouter au Panier",
+    "soldOut": "Épuisé",
+    "viewDetails": "Voir les Détails",
+    "checkout": "Commander via InstaPay"
+  },
+  "footer": {
+    "copyright": "© 2026 EgyRock. Né au Caire.",
+    "instapayNotice": "Paiements manuels vérifiés via InstaPay Égypte."
+  }
+}

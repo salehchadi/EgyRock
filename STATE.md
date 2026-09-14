@@ -2,10 +2,10 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 2 — Design tokens & theme (COMPLETED)
-- **Next Phase**: Phase 3 — Internationalization & RTL scaffolding
-- **Status**: READY FOR PHASE 3
-- **Last Updated**: 2026-09-14 15:45 (Phase 2 completed & verified)
+- **Active Phase**: Phase 3 — Internationalization & RTL scaffolding (COMPLETED)
+- **Next Phase**: Phase 4 — Data access layer (Google Sheets)
+- **Status**: READY FOR PHASE 4
+- **Last Updated**: 2026-09-14 15:57 (Phase 3 completed & verified)
 
 ---
 
@@ -29,15 +29,23 @@
   - [x] Starter page verified: builds with no TypeScript errors (`tsc --noEmit`), lint passes cleanly, and dev server returned `200 OK`
   - [x] Initial commit created (`97e6a04`) with passing pre-commit hooks
 - [x] **Phase 2 — Design tokens & theme**
-  - [x] Color tokens defined in `globals.css` and documented in `ARCHITECTURE.md` (Charcoal `#1c1a17`, Bone `#f2ede4`, Coral `#e0562c`, Border Ash `#3f3b35`, Stock In `#2ea043`, Countdown `#d97706`, Out of Stock `#dc2626`)
-  - [x] Typography loaded via `next/font/google`: Anton (display headings) & Oswald (body/labels) for Latin; Cairo & Almarai for Arabic
+  - [x] Color tokens defined in `globals.css` and documented in `ARCHITECTURE.md`
+  - [x] Typography loaded via `next/font/google`: Anton + Oswald (Latin), Cairo + Almarai (Arabic)
   - [x] Reusable `PosterBadge` component created with 3 status states, 3 locale translations, and angled print stamp styling
   - [x] Pure CSS diagonal screen-print texture utilities created (`bg-screen-print`, `bg-screen-print-dense`)
   - [x] Dynamic page management added to `PROJECT_SPEC.md` and `ARCHITECTURE.md` (Tab 7: `Pages` and `lib/data/pages.ts`)
   - [x] Real placeholder assets extracted from user zip archive to `public/images/placeholders/` with clean aliases
-  - [x] Dev-only `/style-guide` page built and verified with interactive RTL toggle, color swatches, font pairings, and merchandise cards
+  - [x] Dev-only `/style-guide` page built and verified
   - [x] Production build (`npm run build`) passed with 0 errors
-- [ ] **Phase 3 — Internationalization & RTL scaffolding**
+- [x] **Phase 3 — Internationalization & RTL scaffolding**
+  - [x] `next-intl` installed and configured with `[locale]` dynamic route segments (`en`, `ar`, `fr`)
+  - [x] Translation files created in `messages/` (`en.json`, `ar.json`, `fr.json`) with culturally authentic Cairo underground translations
+  - [x] Arabic layout sets `dir="rtl"` on `<html>` with font switching to Cairo/Almarai and true mirrored layout (nav, cards, icons)
+  - [x] Header created with responsive navigation, logo, cart indicator, and `LocaleSwitcher` component
+  - [x] Footer created with copyright and InstaPay payment notice
+  - [x] Localized homepage (`src/app/[locale]/page.tsx`) built and tested in all 3 locales
+  - [x] Verified: `GET /` redirects to `/en`, `GET /ar` renders `dir="rtl"` with Arabic display typography and translations, `GET /fr` renders French
+  - [x] Production build (`npm run build`) and ESLint verified
 - [ ] **Phase 4 — Data access layer (Google Sheets)**
 - [ ] **Phase 5 — Authentication**
 - [ ] **Phase 6 — Homepage**

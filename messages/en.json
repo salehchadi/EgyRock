@@ -1,0 +1,52 @@
+{
+  "brand": {
+    "name": "EgyRock",
+    "tagline": "Cairo Underground Music & Merch"
+  },
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "courses": "Physical Courses",
+    "tshirts": "T-Shirts",
+    "mugs": "Mugs",
+    "accessories": "Accessories",
+    "styleGuide": "Style Guide",
+    "account": "My Account",
+    "cart": "Cart",
+    "admin": "Admin Panel"
+  },
+  "hero": {
+    "badge": "Underground Drop #04",
+    "title": "DISTORTION IN DOWNTOWN CAIRO",
+    "subtitle": "Raw screen-printed band merch, physical guitar mastery boxes, and heavyweight Egyptian streetwear.",
+    "ctaShop": "Shop Collection",
+    "ctaCourses": "Explore Physical Courses"
+  },
+  "categories": {
+    "title": "Shop By Category",
+    "subtitle": "Curated physical merchandise delivered nationwide across Egypt",
+    "courses": "Courses",
+    "coursesDesc": "Physical boxed lesson kits & guitar workbooks",
+    "tshirts": "T-Shirts",
+    "tshirtsDesc": "Heavyweight screen-printed raw rock apparel",
+    "mugs": "Mugs",
+    "mugsDesc": "Ceramic gig poster & distressed coffee mugs",
+    "accessories": "Accessories",
+    "accessoriesDesc": "Strap pins, guitar picks, patches, and caps"
+  },
+  "stock": {
+    "inStock": "In Stock",
+    "onlyLeft": "Only {count} Left",
+    "outOfStock": "Out of Stock"
+  },
+  "actions": {
+    "addToCart": "Add to Cart",
+    "soldOut": "Sold Out",
+    "viewDetails": "View Details",
+    "checkout": "Proceed to Checkout"
+  },
+  "footer": {
+    "copyright": "© 2026 EgyRock. Born in Cairo.",
+    "instapayNotice": "Manual payments handled via InstaPay Egypt."
+  }
+}
