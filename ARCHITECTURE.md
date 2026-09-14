@@ -100,6 +100,21 @@ The frontend **never** interacts directly with Google Sheets. All operations occ
 | `ar`          | String    | Arabic string                                      |
 | `fr`          | String    | French string                                      |
 
+#### Tab 7: `Pages`
+
+| Column Header  | Data Type | Notes / Constraints                                 |
+| -------------- | --------- | --------------------------------------------------- |
+| `id`           | String    | Unique page ID                                      |
+| `slug`         | String    | URL slug (e.g. `about`, `shipping`, `faq`, `terms`) |
+| `title_en`     | String    | English title                                       |
+| `title_ar`     | String    | Arabic title                                        |
+| `title_fr`     | String    | French title                                        |
+| `content_en`   | String    | English content / markdown                          |
+| `content_ar`   | String    | Arabic content / markdown                           |
+| `content_fr`   | String    | French content / markdown                           |
+| `is_published` | Boolean   | `true` / `false`                                    |
+| `updated_at`   | String    | ISO 8601 string                                     |
+
 ---
 
 ## 3. Data Access Layer (DAL) Pattern
@@ -113,6 +128,7 @@ All database reads and writes are encapsulated inside the `lib/data/` directory:
 - `lib/data/users.ts`: `getUserByEmail(email)`, `createUser(data)`.
 - `lib/data/homepageImages.ts`: `getHomepageImages()`, `updateHomepageImages(data)`.
 - `lib/data/translations.ts`: `getTranslations(locale)`, `updateTranslation(key, values)`.
+- `lib/data/pages.ts`: `getPages()`, `getPageBySlug(slug)`, `createPage(data)`, `updatePage(id, data)`, `deletePage(id)`.
 
 > [!TIP]
 > This pattern ensures that when EgyRock scales beyond Google Sheets to PostgreSQL or Supabase, zero changes are required in the UI or API routes; only the functions inside `lib/data/` will be updated.
@@ -200,6 +216,7 @@ egyrock/
     │       ├── orders.ts
     │       ├── users.ts
     │       ├── homepageImages.ts
+    │       ├── pages.ts
     │       └── translations.ts
     └── types/
         └── index.ts              # TypeScript interfaces for all entities

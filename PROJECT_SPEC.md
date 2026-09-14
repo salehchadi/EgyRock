@@ -149,10 +149,11 @@ All operations must be performed directly through the Admin UI with zero code ch
 
 1. **Products**: Add new products, edit details (multilingual titles, descriptions, price, quantity, images), assign categories, delete products.
 2. **Categories**: Add, rename (EN/AR/FR), and delete categories.
-3. **Inventory & Stock**: Adjust quantities directly, configure global or per-product `low_stock_threshold`.
-4. **Orders**: View order queue with filter by status (`Pending payment`, `Confirmed`, `Rejected`), inspect receipt images in full resolution, Confirm (triggering stock decrement) or Reject orders.
-5. **Hero Images**: Upload/link new banners, change links, and modify slide sequence.
-6. **Translations**: Table-style management to look up and update any UI translation key across English, Arabic, and French.
+3. **Pages**: Add, edit, and delete dynamic content pages (e.g. About Us, FAQ, Policies, Terms) with multilingual title and content directly from the frontend admin panel.
+4. **Inventory & Stock**: Adjust quantities directly, configure global or per-product `low_stock_threshold`.
+5. **Orders**: View order queue with filter by status (`Pending payment`, `Confirmed`, `Rejected`), inspect receipt images in full resolution, Confirm (triggering stock decrement) or Reject orders.
+6. **Hero Images**: Upload/link new banners, change links, and modify slide sequence.
+7. **Translations**: Table-style management to look up and update any UI translation key across English, Arabic, and French.
 
 ---
 
