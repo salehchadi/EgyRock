@@ -2,10 +2,10 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 5 — Authentication (COMPLETED)
-- **Next Phase**: Phase 6 — Homepage
-- **Status**: READY FOR PHASE 6
-- **Last Updated**: 2026-09-14 17:02 (Phase 5 completed & verified)
+- **Active Phase**: Phase 6 — Homepage (COMPLETED)
+- **Next Phase**: Phase 7 — Product catalog & stock status
+- **Status**: READY FOR PHASE 7
+- **Last Updated**: 2026-09-14 17:05 (Phase 6 completed & verified)
 
 ---
 
@@ -74,7 +74,13 @@
   - [x] Next.js middleware guarding `/admin` routes (redirects unauthenticated users to login with `callbackUrl`, redirects non-admin authenticated accounts to account)
   - [x] Header updated with dynamic user session indicators and Admin badge
   - [x] Verification completed: tested unauthenticated redirection (`307` to login), tested role separation matrix via `verify-auth.ts`, and confirmed non-admins are blocked from `/admin`
-- [ ] **Phase 6 — Homepage**
+- [x] **Phase 6 — Homepage**
+  - [x] Dynamic `HeroCarousel` component created with auto-advancing 5s interval, hover-pause, manual prev/next buttons, and pagination indicators
+  - [x] Hero carousel pulls live slides from `HomepageImages` DAL with individual image links and localized captions
+  - [x] `CategoryGrid` component created pulling live dynamic categories directly from DAL (admin-editable, not hardcoded)
+  - [x] Cairo Underground aesthetic applied across sections with diagonal screen-print texture, high-contrast borders, and rock poster typography
+  - [x] RTL mirroring and Arabic typography verified when accessing `/ar`
+  - [x] Live data reflection verified via `scripts/verify-homepage.ts`: verified category renaming in database reflects without code changes
 - [ ] **Phase 7 — Product catalog & stock status**
 - [ ] **Phase 8 — Cart**
 - [ ] **Phase 9 — Checkout & manual InstaPay flow**
