@@ -2,9 +2,10 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 1 — Environment & repo scaffold
-- **Status**: IN PROGRESS
-- **Last Updated**: 2026-09-14 15:20 (Phase 1 start)
+- **Active Phase**: Phase 1 — Environment & repo scaffold (COMPLETED)
+- **Next Phase**: Phase 2 — Design tokens & theme
+- **Status**: READY FOR PHASE 2
+- **Last Updated**: 2026-09-14 15:31 (Phase 1 completed & verified)
 
 ---
 
@@ -16,15 +17,17 @@
   - [x] `AGENTS.md` & `CLAUDE.md` created
   - [x] `PLAYBOOK.md` in workspace
   - [x] Node.js v20 LTS configured
-- [ ] **Phase 1 — Environment & repo scaffold**
-  - [ ] Git initialized with `.gitignore`
-  - [ ] Next.js (App Router) + TypeScript scaffolded
-  - [ ] Tailwind CSS configured
-  - [ ] ESLint + Prettier with husky + lint-staged pre-commit hook
-  - [ ] Folder structure per `ARCHITECTURE.md` with `lib/data/`
-  - [ ] `.env.example` created with required variables
-  - [ ] `README.md` with setup instructions
-  - [ ] Verified: `npm run dev` runs with starter page and no errors
+- [x] **Phase 1 — Environment & repo scaffold**
+  - [x] Git repository initialized (`master` branch)
+  - [x] Next.js (App Router) + TypeScript scaffolded with name `egyrock`
+  - [x] Tailwind CSS configured
+  - [x] ESLint + Prettier + Husky + lint-staged configured with active pre-commit hook
+  - [x] Folder structure created per `ARCHITECTURE.md` (`src/lib/data/`, `lib/data/`, `components/`, `messages/`, `scripts/`, `types/`)
+  - [x] `.env.example` created with all required environment variables
+  - [x] `README.md` created with setup instructions, scripts, and documentation links
+  - [x] `.gitignore` configured to ignore `.env*` while preserving `.env.example`
+  - [x] Starter page verified: builds with no TypeScript errors (`tsc --noEmit`), lint passes cleanly, and dev server returned `200 OK`
+  - [x] Initial commit created (`97e6a04`) with passing pre-commit hooks
 - [ ] **Phase 2 — Design tokens & theme**
 - [ ] **Phase 3 — Internationalization & RTL scaffolding**
 - [ ] **Phase 4 — Data access layer (Google Sheets)**
