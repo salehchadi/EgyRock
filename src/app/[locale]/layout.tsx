@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { CartProvider } from "@/components/providers/CartProvider";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -41,9 +42,11 @@ export default async function LocaleLayout({
       <body className="bg-[#1c1a17] text-[#f2ede4] font-body min-h-screen antialiased selection:bg-[#e0562c] selection:text-white flex flex-col justify-between">
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
+            <CartProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </CartProvider>
           </NextIntlClientProvider>
         </AuthProvider>
       </body>
