@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { Link } from "@/i18n/routing";
 
+// Force dynamic rendering to avoid build-time authentication errors
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage({
   params,
 }: {

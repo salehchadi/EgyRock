@@ -9,6 +9,9 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET || "egyrock_dev_super_secret_jwt_key_at_least_32_characters",
+  // Provide a fallback NEXTAUTH_URL for build time
+  // This prevents build errors when NEXTAUTH_URL is not set during static generation
+  ...(process.env.NEXTAUTH_URL ? { url: process.env.NEXTAUTH_URL } : {}),
   pages: {
     signIn: "/auth/login",
   },
