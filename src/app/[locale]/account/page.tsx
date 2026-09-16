@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import { Link } from "@/i18n/routing";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 
-// Force dynamic rendering to avoid build-time authentication errors
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {

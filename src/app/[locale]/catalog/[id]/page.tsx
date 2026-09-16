@@ -57,12 +57,8 @@ export default async function ProductDetailPage({
     .slice(0, 4);
 
   // Product images with fallback
-  const productImages = Array.isArray(product.images)
-    ? product.images
-    : product.images
-      ? [product.images]
-      : [];
-  const images = productImages.length > 0 ? productImages : ["/images/placeholders/egyrock-1.jpeg"];
+  const images =
+    product.images.length > 0 ? product.images : ["/images/placeholders/egyrock-1.jpeg"];
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-12">

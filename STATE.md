@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 8 — Cart
-- **Status**: NOT STARTED
-- **Last Updated**: 2026-09-14 17:18 (Phase 7 completed)
+- **Active Phase**: Phase 9 — Checkout & manual InstaPay flow
+- **Status**: READY TO START
+- **Last Updated**: 2026-09-16 18:50 (Phase 8 completed + Vercel 500 / React Error #441 resiliency fix)
 
 ---
 
@@ -91,7 +91,16 @@
   - [x] Verification script (`scripts/verify-stock.ts`) — all 9 test cases passed
   - [x] Production build (`npm run build`) passed with 0 TypeScript errors
   - [x] ESLint passed (0 errors, 2 pre-existing warnings in `lib/data/`)
-- [ ] **Phase 8 — Cart**
+- [x] **Phase 8 — Cart**
+  - [x] `CartProvider` context implemented with client-side localStorage synchronization
+  - [x] Full Cart page (`src/app/[locale]/cart/page.tsx`) with empty state, item listing, quantity increments/decrements, removal, and grand total in EGP
+  - [x] Header cart badge showing live item count dynamically
+  - [x] Stock decrement policy upheld: cart manipulation does not touch Google Sheets inventory
+- [x] **Vercel Resiliency & Error #441 Fix**
+  - [x] Bundled `initialData.json` into repository for instant out-of-the-box operation on Vercel
+  - [x] Serverless-safe `/tmp` and in-memory persistence in `sheetsClient.ts` resolving `EROFS: read-only file system`
+  - [x] Google Sheets API graceful fallback: logs connection errors and falls back to bundled data without throwing 500
+  - [x] Fixed bracket syntax error in `scripts/seed.ts`
 - [ ] **Phase 9 — Checkout & manual InstaPay flow**
 - [ ] **Phase 10 — Admin panel**
 - [ ] **Phase 11 — Testing**

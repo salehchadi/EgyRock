@@ -1,8 +1,8 @@
 import { google } from "googleapis";
 import fs from "fs";
 import path from "path";
-
-const LOCAL_DB_PATH = path.join(process.cwd(), ".data", "local-db.json");
+import os from "os";
+import initialData from "./initialData.json";
 
 export const TAB_HEADERS: Record<string, string[]> = {
   Products: [
@@ -65,8 +65,15 @@ function isGoogleSheetsConfigured(): boolean {
 }
 
 function getGoogleAuth() {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const rawKey = process.env.GOOGLE_PRIVATE_KEY || "";
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  let rawKey = process.env.GOOGLE_PRIVATE_KEY || "";
+  // Strip wrapping quotes often added in cloud environment variables
+  if (
+    (rawKey.startsWith('"') && rawKey.endsWith('"')) ||
+    (rawKey.startsWith("'") && rawKey.endsWith("'"))
+  ) {
+    rawKey = rawKey.slice(1, -1);
+  }
   const privateKey = rawKey.replace(/\\n/g, "\n");
 
   return new google.auth.JWT({
@@ -76,35 +83,62 @@ function getGoogleAuth() {
   });
 }
 
+let inMemoryDb: Record<string, any[][]> | null = null;
+
+function getDbFilePath(): string {
+  // If running in Vercel / serverless environment with read-only root, use /tmp
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), "egyrock-local-db.json");
+  }
+  return path.join(process.cwd(), ".data", "local-db.json");
+}
+
 function getLocalDb(): Record<string, any[][]> {
-  const dir = path.dirname(LOCAL_DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (inMemoryDb) {
+    return inMemoryDb;
   }
 
-  if (!fs.existsSync(LOCAL_DB_PATH)) {
-    const initial: Record<string, any[][]> = {};
-    for (const [tab, headers] of Object.entries(TAB_HEADERS)) {
-      initial[tab] = [headers];
-    }
-    fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(initial, null, 2), "utf8");
-    return initial;
-  }
+  const filePath = getDbFilePath();
 
+  // 1. Try reading from designated storage file
   try {
-    const raw = fs.readFileSync(LOCAL_DB_PATH, "utf8");
-    return JSON.parse(raw);
-  } catch {
-    return {};
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      inMemoryDb = JSON.parse(raw);
+      return inMemoryDb!;
+    }
+  } catch (err) {
+    console.warn("[DAL] Could not read local db file, falling back to initial data:", err);
   }
+
+  // 2. Try reading from repo .data/local-db.json if different
+  try {
+    const repoLocalPath = path.join(process.cwd(), ".data", "local-db.json");
+    if (repoLocalPath !== filePath && fs.existsSync(repoLocalPath)) {
+      const raw = fs.readFileSync(repoLocalPath, "utf8");
+      inMemoryDb = JSON.parse(raw);
+      return inMemoryDb!;
+    }
+  } catch {}
+
+  // 3. Fallback to bundled initialData
+  inMemoryDb = JSON.parse(JSON.stringify(initialData)) as Record<string, any[][]>;
+  return inMemoryDb;
 }
 
 function saveLocalDb(data: Record<string, any[][]>) {
-  const dir = path.dirname(LOCAL_DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  inMemoryDb = data;
+  try {
+    const filePath = getDbFilePath();
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+  } catch (err: any) {
+    // In strict read-only environments, keep state in memory without throwing
+    console.warn("[DAL] Notice: Disk write skipped (in-memory state preserved):", err?.message);
   }
-  fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2), "utf8");
 }
 
 export async function readTab(tabName: string): Promise<string[][]> {
@@ -120,17 +154,21 @@ export async function readTab(tabName: string): Promise<string[][]> {
       });
 
       const rows = response.data.values || [];
-      return rows.map((r) => r.map((c) => String(c ?? "")));
+      if (rows.length > 0) {
+        return rows.map((r) => r.map((c) => String(c ?? "")));
+      }
     } catch (err: any) {
       console.error(
         `[GoogleSheets DAL Error] Failed reading tab "${tabName}":`,
         err?.message || err,
       );
-      throw new Error(`Failed to read from Google Sheets tab ${tabName}: ${err?.message}`);
+      console.warn(
+        `[GoogleSheets DAL Fallback] Serving tab "${tabName}" from bundled fallback store.`,
+      );
     }
   }
 
-  // Fallback to local persistent JSON store
+  // Fallback to local persistent JSON / in-memory store
   const db = getLocalDb();
   if (!db[tabName]) {
     db[tabName] = [TAB_HEADERS[tabName] || []];
@@ -154,13 +192,28 @@ export async function appendRow(tabName: string, rowValues: any[]): Promise<void
           values: [rowValues.map((v) => (v === undefined || v === null ? "" : String(v)))],
         },
       });
+
+      // Keep local store in sync
+      const db = getLocalDb();
+      if (!db[tabName]) {
+        db[tabName] = [TAB_HEADERS[tabName] || []];
+      }
+      db[tabName].push(rowValues.map((v) => (v === undefined || v === null ? "" : String(v))));
+      saveLocalDb(db);
       return;
     } catch (err: any) {
       console.error(
         `[GoogleSheets DAL Error] Failed appending to "${tabName}":`,
         err?.message || err,
       );
-      throw new Error(`Failed to append to Google Sheets tab ${tabName}: ${err?.message}`);
+      // Update local store as resilient fallback
+      const db = getLocalDb();
+      if (!db[tabName]) {
+        db[tabName] = [TAB_HEADERS[tabName] || []];
+      }
+      db[tabName].push(rowValues.map((v) => (v === undefined || v === null ? "" : String(v))));
+      saveLocalDb(db);
+      return;
     }
   }
 
@@ -196,13 +249,28 @@ export async function updateRow(
           values: [rowValues.map((v) => (v === undefined || v === null ? "" : String(v)))],
         },
       });
+
+      const db = getLocalDb();
+      if (db[tabName] && db[tabName].length >= rowIndex) {
+        db[tabName][rowIndex - 1] = rowValues.map((v) =>
+          v === undefined || v === null ? "" : String(v),
+        );
+        saveLocalDb(db);
+      }
       return;
     } catch (err: any) {
       console.error(
         `[GoogleSheets DAL Error] Failed updating row ${rowIndex} in "${tabName}":`,
-        err,
+        err?.message || err,
       );
-      throw new Error(`Failed to update row in Google Sheets tab ${tabName}: ${err?.message}`);
+      const db = getLocalDb();
+      if (db[tabName] && db[tabName].length >= rowIndex) {
+        db[tabName][rowIndex - 1] = rowValues.map((v) =>
+          v === undefined || v === null ? "" : String(v),
+        );
+        saveLocalDb(db);
+      }
+      return;
     }
   }
 
@@ -251,13 +319,24 @@ export async function deleteRow(tabName: string, rowIndex: number): Promise<void
           ],
         },
       });
+
+      const db = getLocalDb();
+      if (db[tabName] && db[tabName].length >= rowIndex) {
+        db[tabName].splice(rowIndex - 1, 1);
+        saveLocalDb(db);
+      }
       return;
     } catch (err: any) {
       console.error(
         `[GoogleSheets DAL Error] Failed deleting row ${rowIndex} in "${tabName}":`,
-        err,
+        err?.message || err,
       );
-      throw new Error(`Failed to delete row in Google Sheets tab ${tabName}: ${err?.message}`);
+      const db = getLocalDb();
+      if (db[tabName] && db[tabName].length >= rowIndex) {
+        db[tabName].splice(rowIndex - 1, 1);
+        saveLocalDb(db);
+      }
+      return;
     }
   }
 

@@ -19,7 +19,8 @@ function rowToProduct(row: string[], index: number): Product {
     if (imagesData) {
       // Try parsing as JSON first
       if (imagesData.startsWith("[")) {
-        images = JSON.parse(imagesData);
+        const parsed = JSON.parse(imagesData);
+        images = Array.isArray(parsed) ? parsed : [];
       } else {
         // Fallback to comma-separated
         images = imagesData
@@ -54,9 +55,7 @@ function rowToProduct(row: string[], index: number): Product {
  */
 function productToRow(product: Product): string[] {
   // Serialize images array to JSON string for storage
-  const imagesData = Array.isArray(product.images)
-    ? JSON.stringify(product.images)
-    : product.images || "";
+  const imagesData = JSON.stringify(product.images || []);
 
   return [
     product.id,

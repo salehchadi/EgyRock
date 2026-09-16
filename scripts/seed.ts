@@ -53,7 +53,7 @@ const PRODUCTS = [
       "Cours de guitare pour débutants complet avec cahier physique, USB instructif et cartes d'accords.",
     price: 450,
     quantity: 15,
-    images: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400",
+    images: ["https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400"],
   },
   {
     category_id: "courses",
@@ -67,7 +67,7 @@ const PRODUCTS = [
       "Kit d'apprentissage de la batterie physique avec graphiques rythmiques, guide de technique de baguettes et tampon de pratique.",
     price: 380,
     quantity: 8,
-    images: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=400",
+    images: ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=400"],
   },
   // T-shirts
   {
@@ -81,7 +81,7 @@ const PRODUCTS = [
       "T-shirt en coton premium avec artwork authentique de la scène rock underground du Caire.",
     price: 180,
     quantity: 25,
-    images: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"],
   },
   {
     category_id: "t-shirts",
@@ -93,7 +93,7 @@ const PRODUCTS = [
     desc_fr: "T-shirt de festival édition limitée avec esthétique rock du désert égyptien.",
     price: 200,
     quantity: 12,
-    images: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400",
+    images: ["https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400"],
   },
   {
     category_id: "t-shirts",
@@ -105,7 +105,7 @@ const PRODUCTS = [
     desc_fr: "Logo d'amplificateur classique avec motif pyramide, coton lourd.",
     price: 165,
     quantity: 30,
-    images: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400",
+    images: ["https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400"],
   },
   // Mugs
   {
@@ -118,7 +118,7 @@ const PRODUCTS = [
     desc_fr: "Tasse en céramique avec design du Nil et pont de guitare.",
     price: 85,
     quantity: 20,
-    images: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    images: ["https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400"],
   },
   {
     category_id: "mugs",
@@ -130,7 +130,7 @@ const PRODUCTS = [
     desc_fr: "Tasse audacieuse présentant un pharaon avec artwork de guitare électrique.",
     price: 95,
     quantity: 18,
-    images: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    images: ["https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400"],
   },
   // Accessories
   {
@@ -143,7 +143,7 @@ const PRODUCTS = [
     desc_fr: "Sangle de guitare tissée à la main avec motifs égyptiens traditionnels.",
     price: 120,
     quantity: 10,
-    images: "https://images.unsplash.com/photo-1550985543-f47f384b90c0?w=400",
+    images: ["https://images.unsplash.com/photo-1550985543-f47f384b90c0?w=400"],
   },
   {
     category_id: "accessories",
@@ -156,7 +156,7 @@ const PRODUCTS = [
       "Ensemble de 5 patchs à repasser présentant des logos de groupes underground du Caire.",
     price: 65,
     quantity: 35,
-    images: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    images: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400"],
   },
 ];
 

@@ -14,7 +14,7 @@ export interface Product {
   desc_fr: string;
   price: number;
   quantity: number;
-  images: string | string[];
+  images: string[];
   created_at: string;
 }
 
