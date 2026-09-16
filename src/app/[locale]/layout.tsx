@@ -10,9 +10,8 @@ import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
+// Force dynamic rendering to avoid NextAuth build-time issues
+export const dynamic = "force-dynamic";
 
 export default async function LocaleLayout({
   children,
