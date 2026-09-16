@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { fontAnton, fontOswald, fontCairo, fontAlmarai } from "../fonts";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
@@ -39,15 +40,17 @@ export default async function LocaleLayout({
       className={`${fontAnton.variable} ${fontOswald.variable} ${fontCairo.variable} ${fontAlmarai.variable}`}
     >
       <body className="bg-[#1c1a17] text-[#f2ede4] font-body min-h-screen antialiased selection:bg-[#e0562c] selection:text-white flex flex-col justify-between">
-        <AuthProvider>
-          <NextIntlClientProvider messages={messages}>
-            <CartProvider>
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </CartProvider>
-          </NextIntlClientProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <NextIntlClientProvider messages={messages}>
+              <CartProvider>
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </CartProvider>
+            </NextIntlClientProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

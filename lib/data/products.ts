@@ -12,6 +12,27 @@ const SHEET_NAME = "Products";
  * Convert row array to Product object
  */
 function rowToProduct(row: string[], index: number): Product {
+  // Parse images field - handle both comma-separated strings and JSON arrays
+  let images: string[] = [];
+  try {
+    const imagesData = row[10] || "";
+    if (imagesData) {
+      // Try parsing as JSON first
+      if (imagesData.startsWith("[")) {
+        images = JSON.parse(imagesData);
+      } else {
+        // Fallback to comma-separated
+        images = imagesData
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+    }
+  } catch {
+    // If parsing fails, use empty array
+    images = [];
+  }
+
   return {
     id: row[0] || "",
     category_id: row[1] || "",
@@ -23,7 +44,7 @@ function rowToProduct(row: string[], index: number): Product {
     desc_fr: row[7] || "",
     price: parseFloat(row[8]) || 0,
     quantity: parseInt(row[9]) || 0,
-    images: row[10] || "",
+    images,
     created_at: row[11] || new Date().toISOString(),
   };
 }
@@ -32,6 +53,11 @@ function rowToProduct(row: string[], index: number): Product {
  * Convert Product object to row array
  */
 function productToRow(product: Product): string[] {
+  // Serialize images array to JSON string for storage
+  const imagesData = Array.isArray(product.images)
+    ? JSON.stringify(product.images)
+    : product.images || "";
+
   return [
     product.id,
     product.category_id,
@@ -43,7 +69,7 @@ function productToRow(product: Product): string[] {
     product.desc_fr,
     product.price.toString(),
     product.quantity.toString(),
-    product.images,
+    imagesData,
     product.created_at,
   ];
 }

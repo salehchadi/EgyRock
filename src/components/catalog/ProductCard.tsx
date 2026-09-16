@@ -27,7 +27,9 @@ export function ProductCard({ product, locale }: ProductCardProps) {
       ? product.desc_fr || product.desc_en
       : product.desc_en;
 
-  const imageSrc = product.images?.[0] || "/images/placeholders/egyrock-1.jpeg";
+  const imageSrc = Array.isArray(product.images)
+    ? product.images[0]
+    : product.images || "/images/placeholders/egyrock-1.jpeg";
 
   return (
     <div

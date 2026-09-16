@@ -87,7 +87,9 @@ export default function CartPage() {
               ? product.name_fr || product.name_en
               : product.name_en;
 
-          const imageSrc = product.images?.[0] || "/images/placeholders/egyrock-1.jpeg";
+          const imageSrc = Array.isArray(product.images)
+            ? product.images[0]
+            : product.images || "/images/placeholders/egyrock-1.jpeg";
 
           const lineTotal = product.price * quantity;
 

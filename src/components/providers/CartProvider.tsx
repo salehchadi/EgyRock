@@ -9,7 +9,7 @@ import React, {
   useRef,
   ReactNode,
 } from "react";
-import { Product } from "@/types";
+import type { Product } from "@/types";
 
 const CART_KEY = "egyrock_cart";
 
