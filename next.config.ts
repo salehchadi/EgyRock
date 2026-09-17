@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000",
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

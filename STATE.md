@@ -3,104 +3,21 @@
 ## Current Phase
 
 - **Active Phase**: Phase 9 — Checkout & manual InstaPay flow
-- **Status**: READY TO START
-- **Last Updated**: 2026-09-16 18:50 (Phase 8 completed + Vercel 500 / React Error #441 resiliency fix)
+- **Status**: IN PROGRESS
+- **Last Updated**: 2026-09-17 (Vercel Build Error Fixed, Moving to Phase 9)
 
 ---
 
 ## Phase Execution Checklist
 
-- [x] **Phase 0 — Requirements lock-in**
-  - [x] `PROJECT_SPEC.md` created and approved
-  - [x] `ARCHITECTURE.md` created and approved
-  - [x] `AGENTS.md` & `CLAUDE.md` created
-  - [x] `PLAYBOOK.md` in workspace
-  - [x] Node.js v20 LTS configured
-- [x] **Phase 1 — Environment & repo scaffold**
-  - [x] Git repository initialized (`master` branch)
-  - [x] Next.js (App Router) + TypeScript scaffolded with name `egyrock`
-  - [x] Tailwind CSS configured
-  - [x] ESLint + Prettier + Husky + lint-staged configured with active pre-commit hook
-  - [x] Folder structure created per `ARCHITECTURE.md` (`src/lib/data/`, `lib/data/`, `components/`, `messages/`, `scripts/`, `types/`)
-  - [x] `.env.example` created with all required environment variables
-  - [x] `README.md` created with setup instructions, scripts, and documentation links
-  - [x] `.gitignore` configured to ignore `.env*` while preserving `.env.example`
-  - [x] Starter page verified: builds with no TypeScript errors (`tsc --noEmit`), lint passes cleanly, and dev server returned `200 OK`
-  - [x] Initial commit created (`97e6a04`) with passing pre-commit hooks
-- [x] **Phase 2 — Design tokens & theme**
-  - [x] Color tokens defined in `globals.css` and documented in `ARCHITECTURE.md`
-  - [x] Typography loaded via `next/font/google`: Anton + Oswald (Latin), Cairo + Almarai (Arabic)
-  - [x] Reusable `PosterBadge` component created with 3 status states, 3 locale translations, and angled print stamp styling
-  - [x] Pure CSS diagonal screen-print texture utilities created (`bg-screen-print`, `bg-screen-print-dense`)
-  - [x] Dynamic page management added to `PROJECT_SPEC.md` and `ARCHITECTURE.md` (Tab 7: `Pages` and `lib/data/pages.ts`)
-  - [x] Real placeholder assets extracted from user zip archive to `public/images/placeholders/` with clean aliases
-  - [x] Dev-only `/style-guide` page built and verified
-  - [x] Production build (`npm run build`) passed with 0 errors
-- [x] **Phase 3 — Internationalization & RTL scaffolding**
-  - [x] `next-intl` installed and configured with `[locale]` dynamic route segments (`en`, `ar`, `fr`)
-  - [x] Translation files created in `messages/` (`en.json`, `ar.json`, `fr.json`) with culturally authentic Cairo underground translations
-  - [x] Arabic layout sets `dir="rtl"` on `<html>` with font switching to Cairo/Almarai and true mirrored layout (nav, cards, icons)
-  - [x] Header created with responsive navigation, logo, cart indicator, and `LocaleSwitcher` component
-  - [x] Footer created with copyright and InstaPay payment notice
-  - [x] Localized homepage (`src/app/[locale]/page.tsx`) built and tested in all 3 locales
-  - [x] Verified: `GET /` redirects to `/en`, `GET /ar` renders `dir="rtl"` with Arabic display typography and translations, `GET /fr` renders French
-  - [x] Production build (`npm run build`) and ESLint verified
-- [x] **Phase 4 — Data access layer (Google Sheets)**
-  - [x] Google Sheets connection client (`lib/data/sheetsClient.ts`) created with rate-limiting and retry wrappers
-  - [x] Sheet initialization script (`scripts/init-sheets.ts`) created to set up tabs with proper headers
-  - [x] Data access layer modules created for all entities:
-    - [x] `lib/data/products.ts` - CRUD operations + stock decrement
-    - [x] `lib/data/categories.ts` - CRUD operations
-    - [x] `lib/data/orders.ts` - CRUD operations + status management
-    - [x] `lib/data/users.ts` - CRUD operations + email validation
-    - [x] `lib/data/homepageImages.ts` - CRUD operations + sorting
-    - [x] `lib/data/translations.ts` - CRUD operations + locale filtering
-    - [x] `lib/data/pages.ts` - CRUD operations + slug validation
-  - [x] TypeScript types defined in `lib/types/index.ts` for all entities
-  - [x] Seed script (`scripts/seed.ts`) created with sample products, categories, homepage images, translations, and admin user
-  - [x] Test script (`scripts/test-dal.ts`) created to verify DAL structure
-  - [x] Test API route (`src/app/api/test-connection/route.ts`) created for end-to-end verification
-  - [x] Production build (`npm run build`) passed with 0 TypeScript errors
-  - [x] DAL structure test passed: all 8 modules verified with correct exports
-- [x] **Phase 5 — Authentication**
-  - [x] NextAuth.js credentials-based authentication implemented with bcrypt password hashing
-  - [x] Two roles supported: `customer` and `admin` backed by the Users data access layer
-  - [x] Custom localized login page (`src/app/[locale]/auth/login/page.tsx`) styled with Cairo Underground aesthetics, error feedback, and Suspense boundary
-  - [x] Custom localized registration page (`src/app/[locale]/auth/register/page.tsx`) with auto-sign-in flow
-  - [x] NextAuth `AuthProvider` session wrapper integrated into locale root layout
-  - [x] User Account page (`src/app/[locale]/account/page.tsx`) displaying email, name, role stamp, sign-out button, and order history placeholder
-  - [x] Protected Admin Control Center (`src/app/[locale]/admin/page.tsx`) strictly enforcing `role === "admin"`
-  - [x] Next.js middleware guarding `/admin` routes (redirects unauthenticated users to login with `callbackUrl`, redirects non-admin authenticated accounts to account)
-  - [x] Header updated with dynamic user session indicators and Admin badge
-  - [x] Verification completed: tested unauthenticated redirection (`307` to login), tested role separation matrix via `verify-auth.ts`, and confirmed non-admins are blocked from `/admin`
-- [x] **Phase 6 — Homepage**
-  - [x] Dynamic `HeroCarousel` component created with auto-advancing 5s interval, hover-pause, manual prev/next buttons, and pagination indicators
-  - [x] Hero carousel pulls live slides from `HomepageImages` DAL with individual image links and localized captions
-  - [x] `CategoryGrid` component created pulling live dynamic categories directly from DAL (admin-editable, not hardcoded)
-  - [x] Cairo Underground aesthetic applied across sections with diagonal screen-print texture, high-contrast borders, and rock poster typography
-  - [x] RTL mirroring and Arabic typography verified when accessing `/ar`
-  - [x] Live data reflection verified via `scripts/verify-homepage.ts`: verified category renaming in database reflects without code changes
-- [x] **Phase 7 — Product catalog & stock status**
-  - [x] Product listing page (`src/app/[locale]/catalog/page.tsx`) with category filter bar and grid layout
-  - [x] `ProductCard` component with localized name/desc, stock badge, price, and dimmed out-of-stock styling
-  - [x] `CategoryFilter` client component with dynamic category buttons from DAL
-  - [x] `AddToCartButton` client component with quantity selector and localStorage cart (does NOT decrement stock)
-  - [x] Product detail page (`src/app/[locale]/catalog/[id]/page.tsx`) with image gallery, breadcrumb, localized content, shipping/InstaPay callout, and related products
-  - [x] `ProductImageGallery` client component with main image, prev/next arrows, thumbnail strip, RTL support
-  - [x] Stock-status utility (`src/lib/stock.ts`) as single shared function: quantity 0 → out_of_stock, ≤5 → countdown, >5 → in_stock
-  - [x] Verification script (`scripts/verify-stock.ts`) — all 9 test cases passed
-  - [x] Production build (`npm run build`) passed with 0 TypeScript errors
-  - [x] ESLint passed (0 errors, 2 pre-existing warnings in `lib/data/`)
-- [x] **Phase 8 — Cart**
-  - [x] `CartProvider` context implemented with client-side localStorage synchronization
-  - [x] Full Cart page (`src/app/[locale]/cart/page.tsx`) with empty state, item listing, quantity increments/decrements, removal, and grand total in EGP
-  - [x] Header cart badge showing live item count dynamically
-  - [x] Stock decrement policy upheld: cart manipulation does not touch Google Sheets inventory
+...
+
 - [x] **Vercel Resiliency & Error #441 Fix**
   - [x] Bundled `initialData.json` into repository for instant out-of-the-box operation on Vercel
   - [x] Serverless-safe `/tmp` and in-memory persistence in `sheetsClient.ts` resolving `EROFS: read-only file system`
   - [x] Google Sheets API graceful fallback: logs connection errors and falls back to bundled data without throwing 500
   - [x] Fixed bracket syntax error in `scripts/seed.ts`
+  - [x] Fixed `TypeError: Invalid URL` during build by providing fallback `NEXTAUTH_URL` in `next.config.ts`
 - [ ] **Phase 9 — Checkout & manual InstaPay flow**
 - [ ] **Phase 10 — Admin panel**
 - [ ] **Phase 11 — Testing**
