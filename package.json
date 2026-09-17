@@ -11,7 +11,8 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "db:init": "npx tsx scripts/init-sheets.ts",
-    "db:seed": "npx tsx scripts/seed.ts"
+    "db:seed": "npx tsx scripts/seed.ts",
+    "setup:google": "node scripts/setup-google.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
