@@ -21,25 +21,25 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-[#1c1a17]/95 backdrop-blur-md border-b-2 border-[#3f3b35] shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between gap-2 h-16 sm:h-20">
           {/* Brand / Logo */}
-          <div className="flex-shrink-0 flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link
               href="/"
-              className="group flex items-center gap-2 text-[#f2ede4] hover:text-[#e0562c] transition"
+              className="group flex items-center gap-2 min-w-0 text-[#f2ede4] hover:text-[#e0562c] transition"
             >
-              <div className="w-9 h-9 bg-[#e0562c] border-2 border-[#f2ede4] flex items-center justify-center font-heading text-xl text-white transform -rotate-3 group-hover:rotate-0 transition-transform shadow-[2px_2px_0px_black]">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 bg-[#e0562c] border-2 border-[#f2ede4] flex items-center justify-center font-heading text-base sm:text-xl text-white transform -rotate-3 group-hover:rotate-0 transition-transform shadow-[2px_2px_0px_black]">
                 ER
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col min-w-0">
                 <span
-                  className={`text-2xl tracking-wider font-extrabold uppercase leading-none ${
-                    isArabic ? "font-arabic-heading text-xl" : "font-heading"
+                  className={`text-base sm:text-2xl tracking-wider font-extrabold uppercase leading-none ${
+                    isArabic ? "font-arabic-heading sm:text-xl" : "font-heading"
                   }`}
                 >
                   {brandT("name")}
                 </span>
-                <span className="text-[10px] text-[#9e978e] tracking-widest uppercase mt-0.5">
+                <span className="hidden sm:block text-[10px] text-[#9e978e] tracking-widest uppercase mt-0.5">
                   Cairo Underground
                 </span>
               </div>
@@ -47,7 +47,7 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
             <Link
               href="/"
               className={`text-sm uppercase transition hover:text-[#e0562c] tracking-wider text-[#f2ede4] ${
@@ -83,8 +83,11 @@ export function Header() {
           </nav>
 
           {/* Right Action Area (Locale Switcher, Account, Cart) */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <LocaleSwitcher />
+          <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
+            {/* Locale switcher — hidden on phones, moved into the mobile dropdown to keep the topbar from overflowing */}
+            <div className="hidden sm:block">
+              <LocaleSwitcher />
+            </div>
 
             {/* Account / Auth link */}
             {session?.user ? (
@@ -99,16 +102,18 @@ export function Header() {
                 )}
                 <Link
                   href="/account"
-                  className="px-3 py-1.5 border border-[#3f3b35] bg-[#282521] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] transition flex items-center gap-1.5"
+                  className="px-1.5 sm:px-3 py-1.5 border border-[#3f3b35] bg-[#282521] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] transition flex items-center gap-1.5"
                 >
                   <span className="w-2 h-2 rounded-full bg-[#2ea043]" />
-                  <span className="max-w-[100px] truncate">{user.name || "Account"}</span>
+                  <span className="max-w-[52px] sm:max-w-[100px] truncate">
+                    {user.name || "Account"}
+                  </span>
                 </Link>
               </div>
             ) : (
               <Link
                 href="/auth/login"
-                className="px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] hover:text-[#e0562c] transition"
+                className="px-1.5 sm:px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-xs font-heading uppercase tracking-wider text-[#f2ede4] hover:text-[#e0562c] transition"
               >
                 {isArabic ? "دخول" : "SIGN IN"}
               </Link>
@@ -117,7 +122,7 @@ export function Header() {
             {/* Cart Icon / Trigger */}
             <Link
               href="/cart"
-              className="relative p-2 border border-[#3f3b35] bg-[#282521] hover:border-[#e0562c] text-[#f2ede4] transition flex items-center gap-2 group shadow-[2px_2px_0px_rgba(0,0,0,0.5)]"
+              className="relative p-1.5 sm:p-2 border border-[#3f3b35] bg-[#282521] hover:border-[#e0562c] text-[#f2ede4] transition flex items-center gap-2 group shadow-[2px_2px_0px_rgba(0,0,0,0.5)]"
               aria-label="Cart"
             >
               <svg
@@ -144,7 +149,7 @@ export function Header() {
             {/* Mobile menu trigger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 border border-[#3f3b35] text-[#f2ede4] hover:border-[#e0562c]"
+              className="lg:hidden p-1.5 sm:p-2 border border-[#3f3b35] text-[#f2ede4] hover:border-[#e0562c]"
               aria-label="Toggle Menu"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,7 +175,7 @@ export function Header() {
 
         {/* Mobile Dropdown Menu */}
         {mobileOpen && (
-          <div className="md:hidden py-4 border-t border-[#3f3b35] space-y-3">
+          <div className="lg:hidden py-4 border-t border-[#3f3b35] space-y-3">
             <Link
               href="/"
               onClick={() => setMobileOpen(false)}
@@ -199,6 +204,15 @@ export function Header() {
             >
               {t("styleGuide")}
             </Link>
+
+            {/* Language switcher — only needed here on phones, where the
+                topbar version is hidden to prevent horizontal overflow */}
+            <div className="pt-2 sm:hidden border-t border-[#3f3b35]">
+              <span className="block text-[10px] uppercase tracking-widest text-[#9e978e] mb-2">
+                {isArabic ? "اللغة" : "Language"}
+              </span>
+              <LocaleSwitcher />
+            </div>
           </div>
         )}
       </div>

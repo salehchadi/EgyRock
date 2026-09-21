@@ -36,11 +36,35 @@
   --accent: #e0562c;
 }
 
+html {
+  /* Root-level guard: the page itself must never scroll left/right.
+     `clip` is used instead of `hidden` because `hidden` turns the element
+     into a scroll container, which breaks the sticky header. */
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-oswald), sans-serif;
   min-height: 100vh;
+  /* Guard against accidental horizontal page scroll on small screens. */
+  overflow-x: clip;
+}
+
+/* Media must never widen the viewport. Excluded from the blanket rule are
+   svg icons that live inside fixed-size controls (they use explicit w/h). */
+img,
+video {
+  max-width: 100%;
+}
+
+/* Long unbreakable tokens (email addresses, order IDs, slugs) must wrap
+   instead of pushing the layout wider than the viewport. */
+.font-heading,
+.font-arabic-heading,
+.font-body {
+  overflow-wrap: break-word;
 }
 
 /* Locale font overrides */
