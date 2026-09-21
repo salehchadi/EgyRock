@@ -32,19 +32,19 @@ This guide gets your database running in **~5 minutes**. The only manual steps a
 Open a terminal in your project folder and run:
 
 ```bash
-npm run setup:google ~/Downloads/egyrock-key.json
+npm run setup:google ~/Downloads/egyrock-key.json -- --sheet-url "PASTE_YOUR_SHEET_URL_HERE"
 ```
 
-> Replace `~/Downloads/egyrock-key.json` with the actual path to your downloaded file.
+> Replace `~/Downloads/egyrock-key.json` with the actual path to your downloaded file, and `PASTE_YOUR_SHEET_URL_HERE` with the URL of the sheet you created in Step 2.
 
 **That's it.** The script automatically:
 
-- Creates a new Google Sheet named "EgyRock Database"
-- Sets up all 7 tabs with proper headers (Products, Categories, Orders, Users, etc.)
-- Seeds sample data (4 products, categories, admin user, homepage images)
+- Verifies the service account can access your sheet (it checks Editor sharing)
 - Writes your `.env.local` file with all the correct values
+- Sets up all 7 tabs with proper headers (Products, Categories, Orders, Users, etc.)
+- Seeds sample data (products, categories, admin user, homepage images)
 
----
+> ℹ️ **Why the manual step?** Google service accounts on consumer (free Gmail) projects have **zero Drive storage quota**, so they cannot create files themselves. You create the empty sheet once; everything after that is automated.
 
 ## Step 4 — Add Env Vars to Vercel (for production)
 

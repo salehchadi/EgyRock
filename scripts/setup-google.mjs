@@ -1,12 +1,20 @@
 #!/usr/bin/env node
 /**
  * EgyRock Google Sheets Auto-Setup Script
- * Usage: node scripts/setup-google.mjs /path/to/service-account-key.json
  *
- * This script will:
+ * Mode A (recommended — service accounts cannot create Drive files):
+ *   1. In your browser: https://sheets.new  → name it "EgyRock Database"
+ *   2. Copy the full URL of the sheet
+ *   3. Run:
+ *      node scripts/setup-google.mjs /path/to/service-account-key.json --sheet-url "https://docs.google.com/spreadsheets/d/YOUR_ID/edit"
+ *
+ * Mode B (only works if the service account has Drive storage quota):
+ *   node scripts/setup-google.mjs /path/to/service-account-key.json
+ *
+ * The script will:
  * 1. Read your downloaded service account JSON key
- * 2. Create a new Google Sheet via the API
- * 3. Share it with the service account automatically
+ * 2. Attach to (or create) the Google Sheet
+ * 3. Share it with the service account automatically (Mode B only)
  * 4. Write .env.local with all required values
  * 5. Run sheet initialization (create tabs & headers)
  * 6. Run the seed script (populate sample data)
@@ -23,11 +31,27 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 
 async function main() {
-  const keyFilePath = process.argv[2];
+  const args = process.argv.slice(2);
+  const keyFilePath = args.find((a) => !a.startsWith("--"));
+  const sheetUrlIdx = args.indexOf("--sheet-url");
+  const sheetUrl =
+    sheetUrlIdx !== -1 ? args[sheetUrlIdx + 1] : undefined;
 
-  if (!keyFilePath) {
-    console.error("\n❌  Usage: node scripts/setup-google.mjs /path/to/service-account-key.json\n");
+  if (!keyFilePath || (sheetUrlIdx !== -1 && !sheetUrl)) {
+    console.error(
+      "\n❌  Usage:\n" +
+        "    node scripts/setup-google.mjs <key.json> --sheet-url \"<sheet URL>\"\n" +
+        "    node scripts/setup-google.mjs <key.json>   (creates a new sheet — needs Drive quota)\n",
+    );
     process.exit(1);
+  }
+
+  // Extract spreadsheet ID from a full URL or raw ID
+  let existingSheetId;
+  if (sheetUrl) {
+    const match = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    existingSheetId = match ? match[1] : sheetUrl.trim();
+    console.log(`\n📎  Attaching to existing sheet: ${existingSheetId}`);
   }
 
   const absKeyPath = path.resolve(keyFilePath);
@@ -67,50 +91,81 @@ async function main() {
     ],
   });
 
-  // 3. Create a new Google Sheet
-  console.log("📊  Creating Google Sheet...");
+  // 3. Create a new Google Sheet (Mode B) or verify access to existing one (Mode A)
+  console.log("📊  Connecting to Google Sheets...");
   const sheets = google.sheets({ version: "v4", auth });
   const drive = google.drive({ version: "v3", auth });
 
   let sheetId;
-  try {
-    const createResponse = await sheets.spreadsheets.create({
-      requestBody: {
-        properties: { title: "EgyRock Database" },
-        sheets: [
-          { properties: { title: "Products" } },
-          { properties: { title: "Categories" } },
-          { properties: { title: "Orders" } },
-          { properties: { title: "Users" } },
-          { properties: { title: "HomepageImages" } },
-          { properties: { title: "Translations" } },
-          { properties: { title: "Pages" } },
-        ],
-      },
-    });
+  if (existingSheetId) {
+    // Mode A: verify we can read the sheet the user created & shared
+    try {
+      const meta = await sheets.spreadsheets.get({
+        spreadsheetId: existingSheetId,
+      });
+      sheetId = existingSheetId;
+      console.log(
+        `✅  Connected: "${meta.data.properties?.title}" (${(meta.data.sheets || []).length} tabs)`,
+      );
+    } catch (err) {
+      console.error("❌  Cannot read the sheet:", err.message);
+      console.error(
+        `    → Make sure you shared the sheet with:\n      ${serviceAccountEmail}\n    → as **Editor** (Share → add email → Editor).`,
+      );
+      process.exit(1);
+    }
+  } else {
+    // Mode B: create the spreadsheet via the API
+    try {
+      const createResponse = await sheets.spreadsheets.create({
+        requestBody: {
+          properties: { title: "EgyRock Database" },
+          sheets: [
+            { properties: { title: "Products" } },
+            { properties: { title: "Categories" } },
+            { properties: { title: "Orders" } },
+            { properties: { title: "Users" } },
+            { properties: { title: "HomepageImages" } },
+            { properties: { title: "Translations" } },
+            { properties: { title: "Pages" } },
+          ],
+        },
+      });
 
-    sheetId = createResponse.data.spreadsheetId;
-    console.log(`✅  Sheet created: https://docs.google.com/spreadsheets/d/${sheetId}`);
-  } catch (err) {
-    console.error("❌  Failed to create Google Sheet:", err.message);
-    console.error("    Make sure you enabled the Google Sheets API and Google Drive API for this service account's project.");
-    process.exit(1);
+      sheetId = createResponse.data.spreadsheetId;
+      console.log(`✅  Sheet created: https://docs.google.com/spreadsheets/d/${sheetId}`);
+    } catch (err) {
+      console.error("❌  Failed to create Google Sheet:", err.message);
+      console.error(
+        "    Service accounts on consumer projects cannot create files (storage quota = 0).\n" +
+          "    Use Mode A instead:\n" +
+          "      1. Open https://sheets.new in your browser\n" +
+          '      2. Share the sheet with this service account (Editor):\n         ' +
+          serviceAccountEmail +
+          '\n      3. Re-run with: node scripts/setup-google.mjs "' +
+          absKeyPath +
+          '" --sheet-url "<your sheet URL>"',
+      );
+      process.exit(1);
+    }
   }
 
-  // 4. Make the sheet accessible (anyone with link can view, owner can manage)
-  try {
-    await drive.permissions.create({
-      fileId: sheetId,
-      requestBody: {
-        role: "writer",
-        type: "user",
-        emailAddress: serviceAccountEmail,
-      },
-    });
-    console.log("✅  Sheet shared with service account");
-  } catch (err) {
-    // Service accounts own files they create, this is expected to sometimes fail
-    console.log("ℹ️   Sheet ownership already set (service account owns the file)");
+  // 4. Make the sheet accessible (only relevant when we just created it)
+  if (!existingSheetId) {
+    try {
+      await drive.permissions.create({
+        fileId: sheetId,
+        requestBody: {
+          role: "writer",
+          type: "user",
+          emailAddress: serviceAccountEmail,
+        },
+      });
+      console.log("✅  Sheet shared with service account");
+    } catch (err) {
+      // Service accounts own files they create, this is expected to sometimes fail
+      console.log("ℹ️   Sheet ownership already set (service account owns the file)");
+    }
   }
 
   // 5. Generate NEXTAUTH_SECRET
