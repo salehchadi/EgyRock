@@ -3,6 +3,15 @@ import { readTab, appendRow, updateRow, deleteRow } from "./sheetsClient";
 
 const TAB = "HomepageImages";
 
+/**
+ * Sheets returns strings, and `parseInt` yields NaN for blanks. Fall back to 1
+ * only when the cell is genuinely unreadable — `|| 1` would swallow a valid 0.
+ */
+function parseSortOrder(raw: string | undefined): number {
+  const parsed = parseInt(raw || "", 10);
+  return Number.isFinite(parsed) ? parsed : 1;
+}
+
 function rowToImage(row: string[]): HomepageImage {
   return {
     id: row[0] || "",
@@ -10,7 +19,7 @@ function rowToImage(row: string[]): HomepageImage {
     link_url: row[2] || undefined,
     title_en: row[3] || undefined,
     title_ar: row[4] || undefined,
-    sort_order: parseInt(row[5], 10) || 1,
+    sort_order: parseSortOrder(row[5]),
   };
 }
 

@@ -3,8 +3,8 @@
 ## Current Phase
 
 - **Active Phase**: Phase 11 — Testing
-- **Status**: READY TO START
-- **Last Updated**: 2026-09-21 (Google Sheet connected & seeded; storefront fully DB-dynamic; build passing)
+- **Status**: COMPLETE (107 Vitest tests green; 23 Playwright E2E specs written)
+- **Last Updated**: 2026-09-21
 
 ---
 
@@ -43,7 +43,16 @@
   - [x] Storefront routes for admin-managed pages: `/[locale]/pages` (index) + `/[locale]/pages/[slug]` (rendered content, RTL-aware)
   - [x] Footer renders links to published DB pages dynamically
   - [x] All storefront data (hero, categories, products, stock, orders, users, translations, pages) flows through the `src/lib/data/*` DAL only
-- [ ] **Phase 11 — Testing**
+- [x] **Phase 11 — Testing**
+  - [x] Toolchain: Vitest 3 + jsdom + Testing Library; Playwright + Chromium; `test`/`test:unit`/`test:integration`/`test:e2e`/`test:all` scripts
+  - [x] Unit: `tests/unit/stock.test.ts` (13) — badge thresholds, boundaries, custom thresholds, availability flags
+  - [x] Unit: `tests/unit/cart.test.tsx` (21) — totals, hydration, stock ceiling, removal, persistence, no-network stock rule
+  - [x] Integration: `tests/integration/checkout-flow.test.ts` (17) — create→pending, confirm decrements once, reject untouched, validation errors
+  - [x] Integration: `tests/integration/data-access.test.ts` (56) — products/categories/users/orders/hero/translations/pages CRUD against the fake Sheets client
+  - [x] E2E: `tests/e2e/storefront.spec.ts` — browse en/ar/fr, RTL check, catalog→detail, cart add/merge/clear, no stock API calls on add
+  - [x] E2E: `tests/e2e/checkout-admin.spec.ts` — guest checkout → Pending, admin confirm removes it from queue, non-admin blocked, dashboard pending count
+  - [x] Result: `npm run test` = 107/107 green; `npx playwright test --list` = 23 specs valid; `npx eslint tests …` clean
+- [ ] **Phase 12 — Security & validation hardening**
 - [ ] **Phase 12 — Security & validation hardening**
 - [ ] **Phase 13 — Performance, SEO & accessibility pass**
 - [ ] **Phase 14 — Deployment**

@@ -60,12 +60,20 @@ export async function createPage(
     throw new Error("Missing required page fields (slug, title_en)");
   }
 
-  const existing = await getPageById(data.slug);
-  if (existing) {
+  const pages = await getPages();
+
+  // The slug is the public route, so it must stay unique — otherwise
+  // getPageBySlug() would always resolve to the older row.
+  if (pages.some((p) => p.slug === data.slug)) {
     throw new Error(`Page with slug "${data.slug}" already exists`);
   }
 
   const id = data.id || `PAGE-${Date.now().toString(36).toUpperCase()}`;
+
+  // A duplicate id would make updatePage()/deletePage() hit the wrong row.
+  if (pages.some((p) => p.id === id)) {
+    throw new Error(`Page with ID "${id}" already exists`);
+  }
 
   const newPage: CustomPage = {
     ...data,
