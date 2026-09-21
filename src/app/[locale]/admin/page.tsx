@@ -1,8 +1,11 @@
 import React from "react";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { Link } from "@/i18n/routing";
+import { getProducts } from "@/lib/data/products";
+import { getCategories } from "@/lib/data/categories";
+import { getOrders } from "@/lib/data/orders";
+import { getHomepageImages } from "@/lib/data/homepageImages";
+import { getPages } from "@/lib/data/pages";
+import { getTranslations } from "@/lib/data/translations";
 
 export const dynamic = "force-dynamic";
 
@@ -12,57 +15,57 @@ export default async function AdminDashboardPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
-    redirect(`/${locale}/auth/login?callbackUrl=/${locale}/admin`);
-  }
-
-  const user = session.user as any;
-
-  // Strictest enforcement: non-admin roles are immediately blocked and redirected
-  if (user.role !== "admin") {
-    redirect(`/${locale}/account?error=forbidden_admin_only`);
-  }
-
   const isArabic = locale === "ar";
+
+  // Fetch real counts from DAL
+  const [products, categories, orders, heroImages, pages, translations] = await Promise.all([
+    getProducts(),
+    getCategories(),
+    getOrders(),
+    getHomepageImages(),
+    getPages(),
+    getTranslations(),
+  ]);
+
+  const pendingOrders = orders.filter((o) => o.status === "Pending payment");
 
   const adminSections = [
     {
       title: "Products & Inventory",
       desc: "Manage catalog, stock quantities, and physical course packages",
-      path: "/admin/products",
-      count: "8 Products",
+      path: "/admin/products" as const,
+      count: `${products.length} Products`,
     },
     {
       title: "Categories",
       desc: "Rename or create dynamic product categories",
-      path: "/admin/categories",
-      count: "4 Active",
+      path: "/admin/categories" as const,
+      count: `${categories.length} Active`,
     },
     {
       title: "Orders & Receipts",
       desc: "Inspect InstaPay transaction screenshots and confirm/reject orders",
-      path: "/admin/orders",
-      count: "0 Pending",
+      path: "/admin/orders" as const,
+      count: `${pendingOrders.length} Pending`,
+      highlight: pendingOrders.length > 0,
     },
     {
       title: "Homepage Hero",
       desc: "Configure rotating banner images, headlines, and destination links",
-      path: "/admin/hero",
-      count: "3 Slides",
+      path: "/admin/hero" as const,
+      count: `${heroImages.length} Slides`,
     },
     {
       title: "Dynamic Pages",
       desc: "Create, edit, and delete custom pages (About, Shipping, FAQ)",
-      path: "/admin/pages",
-      count: "2 Published",
+      path: "/admin/pages" as const,
+      count: `${pages.filter((p) => p.is_published).length} Published`,
     },
     {
       title: "Translations",
       desc: "Manage UI string translations across EN, AR, and FR without code",
-      path: "/admin/translations",
-      count: "35 Keys",
+      path: "/admin/translations" as const,
+      count: `${translations.length} Keys`,
     },
   ];
 
@@ -84,10 +87,6 @@ export default async function AdminDashboardPage({
             >
               {isArabic ? "مركز تحكم إيجي روك" : "EGYROCK CONTROL CENTER"}
             </h1>
-            <p className="text-xs sm:text-sm text-[#9e978e] mt-1">
-              Logged in as Administrator:{" "}
-              <span className="text-[#f2ede4] font-mono">{user.email}</span>
-            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -104,32 +103,40 @@ export default async function AdminDashboardPage({
       {/* Admin Module Cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {adminSections.map((sec) => (
-          <div
-            key={sec.title}
-            className="underground-card p-6 flex flex-col justify-between border-2 border-[#3f3b35] hover:border-[#e0562c] transition"
-          >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono text-[#e0562c] uppercase font-bold">
-                  {sec.count}
-                </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#9e978e] bg-black/40 px-2 py-0.5">
-                  Live DAL
+          <Link key={sec.title} href={sec.path}>
+            <div
+              className={`underground-card p-6 flex flex-col justify-between border-2 transition h-full ${
+                (sec as any).highlight
+                  ? "border-[#d97706]"
+                  : "border-[#3f3b35] hover:border-[#e0562c]"
+              }`}
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`text-[11px] font-mono uppercase font-bold ${
+                      (sec as any).highlight ? "text-[#d97706]" : "text-[#e0562c]"
+                    }`}
+                  >
+                    {sec.count}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-widest text-[#9e978e] bg-black/40 px-2 py-0.5">
+                    Live DAL
+                  </span>
+                </div>
+                <h2 className="font-heading text-2xl uppercase text-[#f2ede4] tracking-wide">
+                  {sec.title}
+                </h2>
+                <p className="text-xs text-[#9e978e] leading-relaxed">{sec.desc}</p>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-[#3f3b35] flex items-center justify-between">
+                <span className="text-xs uppercase font-heading text-[#e0562c] tracking-wider">
+                  Manage →
                 </span>
               </div>
-              <h2 className="font-heading text-2xl uppercase text-[#f2ede4] tracking-wide">
-                {sec.title}
-              </h2>
-              <p className="text-xs text-[#9e978e] leading-relaxed">{sec.desc}</p>
             </div>
-
-            <div className="pt-4 mt-4 border-t border-[#3f3b35] flex items-center justify-between">
-              <span className="text-xs uppercase font-heading text-[#e0562c] tracking-wider">
-                Phase 10 Module
-              </span>
-              <span className="text-xs text-[#9e978e]">Protected &rarr;</span>
-            </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

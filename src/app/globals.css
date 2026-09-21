@@ -126,3 +126,147 @@ body {
   box-shadow: 4px 4px 0px #e0562c;
   transform: translate(-2px, -2px);
 }
+
+/* ========== Admin Panel Utility Classes ========== */
+
+.admin-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: #1c1a17;
+  border: 1px solid #3f3b35;
+  color: #f2ede4;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: #e0562c;
+  box-shadow: 0 0 0 1px rgba(224, 86, 44, 0.3);
+}
+
+.admin-input::placeholder {
+  color: #9e978e;
+  opacity: 0.7;
+}
+
+.admin-input option {
+  background-color: #1c1a17;
+  color: #f2ede4;
+}
+
+.label-field {
+  display: block;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9e978e;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.admin-btn-primary {
+  padding: 0.5rem 1.25rem;
+  background-color: #e0562c;
+  color: white;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  border: 2px solid black;
+  box-shadow: 3px 3px 0px black;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.admin-btn-primary:hover:not(:disabled) {
+  background-color: #c44721;
+}
+
+.admin-btn-primary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px black;
+}
+
+.admin-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-btn-secondary {
+  padding: 0.5rem 1.25rem;
+  background-color: transparent;
+  color: #9e978e;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  border: 1px solid #3f3b35;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.admin-btn-secondary:hover {
+  border-color: #f2ede4;
+  color: #f2ede4;
+}
+
+.admin-btn-danger {
+  padding: 0.5rem 1.25rem;
+  background-color: transparent;
+  color: #dc2626;
+  font-family: var(--font-anton), sans-serif;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  border: 1px solid #dc2626;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.admin-btn-danger:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+/* Admin status badges */
+.admin-status-pending {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 2px solid #d97706;
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+}
+
+.admin-status-confirmed {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 2px solid #2ea043;
+  color: #2ea043;
+  background: rgba(46, 160, 67, 0.1);
+}
+
+.admin-status-rejected {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
