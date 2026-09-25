@@ -30,13 +30,16 @@ Every product record consists of:
 - `price`: Price in Egyptian Pounds (EGP).
 - `quantity`: Integer representing current stock on hand.
 - `images`: Comma-separated or JSON array of image URLs.
+- `sizes`: Optional list of orderable sizes for wearables (e.g. `S, M, L, XL`). Empty/omitted means the product is **one-size** (mugs, picks, accessories) and no size picker is rendered; the product detail page and cart then omit the size field entirely.
 - `created_at`: ISO timestamp.
 
 ### Dynamic Admin Management
 
 - All product fields are editable directly by an admin via the admin dashboard without requiring any code changes or redeployments.
+- `sizes` are edited as a comma-separated list in the admin product form and shown per product in the products table. Products that list sizes require the customer to choose one before adding to the cart; the chosen size is carried through the cart, the order summary and the order record.
 - Category names are multilingual and editable by the admin.
 - New categories can be created and existing categories can be deleted/modified dynamically from the interface.
+- Categories are **one-level nestable** via `parent_id`: an empty `parent_id` marks a top-level category, any other value points at its parent. Sub-categories are assignable to products and are rendered nested (expand/collapse) inside the storefront menu drawer.
 
 ---
 
@@ -70,19 +73,27 @@ The `quantity` column is the single source of truth for inventory.
 ## 4. Checkout Flow (Manual InstaPay)
 
 1. **Cart**: Customer reviews cart items and proceeds to checkout.
-2. **Details Form**: Customer provides name, phone number, shipping address, and city/governorate.
-3. **InstaPay Instructions**:
-   - Customer is presented with the store's InstaPay handle / mobile number (e.g., `egyrock@instapay` or mobile payment number) and the exact order total in EGP.
+2. **Details Form**: Customer provides name and phone number.
+3. **Shipping Address**: The customer chooses where the order ships:
+   - **Registered address** — ship to the address saved on their profile (pre-selected when present).
+   - **A different address** — a detailed address plus city/governorate typed at checkout.
+4. **Coupon Code (optional)**: the customer can enter a coupon code in the order summary and apply it.
+   - Validation is **server-side only** (`validateCoupon`): the code must exist, be active, not be expired, not have exhausted its usage limit, and the cart subtotal must satisfy the coupon's `min_order`.
+   - The discount is always recomputed from the stored coupon record; a client-supplied amount is never trusted.
+   - The summary shows Subtotal, Discount and the resulting Total, and the coupon can be removed before submitting.
+5. **InstaPay Instructions**:
+   - Customer is presented with the store's InstaPay handle / mobile number (e.g., `egyrock@instapay` or mobile payment number) and the exact order total in EGP, **after** the coupon discount.
    - Clear instructions tell the customer to transfer the total amount via their InstaPay app.
-4. **Receipt Upload**:
+6. **Receipt Upload**:
    - Customer uploads a screenshot of the completed InstaPay transaction receipt (image formats: PNG, JPG, WEBP).
-5. **Order Creation**:
+7. **Order Creation**:
    - The order is created with initial status `Pending payment`.
    - The uploaded receipt image URL is attached to the order.
+   - The applied `coupon_code` and the computed `discount` are stored on the order, and the coupon's `used_count` is incremented exactly once.
    - The customer is redirected to an Order Confirmation screen displaying their Order ID and receipt preview.
    - The order appears immediately in the customer's "Order History" section.
    - **Note**: Stock quantity remains unchanged at this point.
-6. **Admin Verification & Stock Decrement**:
+8. **Admin Verification & Stock Decrement**:
    - Admin views the order list in the admin panel.
    - Admin inspects the customer's uploaded receipt image and compares with InstaPay account transactions.
    - If valid, admin clicks **"Confirm Order"**:
@@ -100,13 +111,13 @@ The `quantity` column is the single source of truth for inventory.
 - **Authentication System**: NextAuth.js credentials-based authentication with bcrypt password hashing.
 - **Roles**:
   1. `customer`:
-     - Can register for an account (name, email, password).
+     - Can register for an account with: full name, email, password, **phone number, address, gender and age**.
      - Can log in and log out.
      - Can view profile and order history (orders, status, tracking details).
      - Can place orders.
   2. `admin`:
      - Can access the protected `/admin` control center.
-     - Full management of products, categories, stock, orders, hero images, and translations.
+     - Full management of products, categories, stock, coupons, orders, hero images, pages, and translations.
 - **Route Protection**:
   - `/admin/*` routes are protected server-side and middleware-level. Any non-admin or unauthenticated visitor is redirected.
 
@@ -121,6 +132,7 @@ The `quantity` column is the single source of truth for inventory.
 - **RTL Integrity for Arabic**:
   - Sets `dir="rtl"` on `<html>`.
   - True mirrored layout: navigation bars, cards, grid directions, form controls, icons, and drawer trays must mirror appropriately.
+  - **Navigation Drawer**: the mobile menu is a slide-in drawer that opens from the **left** edge in LTR locales (`en`, `fr`) and from the **right** edge in RTL (`ar`), with mirrored animation.
   - Dedicated display and body Arabic typography (e.g. Cairo / Almarai) to preserve brand weight and energy in Arabic.
 - **Editable Translations**:
   - Every UI string (buttons, headers, validation messages, badges) is stored in the database / `Translations` sheet and is editable via the Admin UI without code updates.
@@ -130,16 +142,14 @@ The `quantity` column is the single source of truth for inventory.
 
 ## 7. Homepage Specifications
 
-- **Hero Banner**:
-  - Dynamic rotating hero section showing 3 slides/images.
-  - Auto-advancing with manual previous/next controls and indicator dots.
-  - Each slide features an editable image URL, optional link URL, headline, and sort order.
-  - Fully manageable and reorderable via the Admin panel.
-- **Shop by Category Section**:
-  - Dynamically displays all active categories fetched directly from the database (not hardcoded).
-  - Cards feature category titles in the active language and styled with underground rock aesthetic.
-- **Featured Products Section**:
-  - Highlights selected or newest products with stock status badges and quick view/cart actions.
+- **Mobile-first**: the storefront is designed phone-first and scales up. Layout, tap targets and typography are tuned for a small screen before desktop.
+- **The products strip is the first — and only — section of the homepage**:
+  - There is **no** hero banner, **no** "shop by category" tile grid and **no** separate featured section on the homepage.
+  - The page opens directly on the product list, fetched live through the DAL (no hardcoded products).
+  - The strip scrolls horizontally: swipe on touch devices, scrollbar / trackpad / keyboard on desktop. It is a single row of cards — never a multi-row page-level grid.
+  - Each card shows the product image, poster-stamp stock badge, category, localized title, price and links to the product detail page.
+- **Categories live in the menu drawer**: category and sub-category navigation is provided by the drawer (§6) rather than by homepage tiles.
+- **Hero images**: admin-managed hero slides are still stored in the `HomepageImages` tab and remain editable from the admin panel, but they are intentionally **not rendered on the homepage**.
 
 ---
 

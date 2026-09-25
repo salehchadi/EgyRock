@@ -20,6 +20,8 @@ const EMPTY_PRODUCT = {
   quantity: 0,
   category_id: "",
   images: "",
+  // Wearables: comma-separated list (e.g. "S, M, L"). Empty = one-size product.
+  sizes: "",
 };
 
 export default function AdminProductsClient({
@@ -52,6 +54,7 @@ export default function AdminProductsClient({
       quantity: p.quantity,
       category_id: p.category_id,
       images: Array.isArray(p.images) ? p.images.join(", ") : p.images || "",
+      sizes: Array.isArray(p.sizes) ? p.sizes.join(", ") : "",
     });
     setEditing(p);
     setCreating(false);
@@ -78,6 +81,12 @@ export default function AdminProductsClient({
           quantity: Number(form.quantity),
           images: form.images
             ? form.images
+                .split(",")
+                .map((s: string) => s.trim())
+                .filter(Boolean)
+            : [],
+          sizes: form.sizes
+            ? String(form.sizes)
                 .split(",")
                 .map((s: string) => s.trim())
                 .filter(Boolean)
@@ -123,24 +132,22 @@ export default function AdminProductsClient({
         <div>
           <a
             href={`/${locale}/admin`}
-            className="text-xs text-[#9e978e] hover:text-[#e0562c] uppercase tracking-widest"
+            className="text-xs text-muted hover:text-brand uppercase tracking-widest"
           >
             ← Admin
           </a>
-          <h1 className="text-3xl font-heading uppercase text-[#f2ede4] mt-1">
-            Products & Inventory
-          </h1>
+          <h1 className="text-3xl font-heading uppercase text-ink mt-1">Products & Inventory</h1>
         </div>
         <button
           onClick={openCreate}
-          className="px-5 py-2.5 bg-[#e0562c] hover:bg-[#c44721] text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
+          className="px-5 py-2.5 bg-brand hover:bg-brand-strong text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
         >
           + Add Product
         </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold">
+        <div className="p-3 bg-danger/15 border border-danger text-danger text-xs uppercase font-bold">
           {error}
         </div>
       )}
@@ -148,8 +155,8 @@ export default function AdminProductsClient({
       {/* Modal Form */}
       {(creating || editing) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="bg-[#282521] border-2 border-[#e0562c] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_#e0562c]">
-            <h2 className="text-xl font-heading uppercase text-[#f2ede4] mb-4">
+          <div className="bg-surface border-2 border-brand w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_var(--color-brand)]">
+            <h2 className="text-xl font-heading uppercase text-ink mb-4">
               {editing ? "Edit Product" : "New Product"}
             </h2>
 
@@ -231,6 +238,22 @@ export default function AdminProductsClient({
               />
             </div>
 
+            {/* Wearables only: sizes offered on the product page and cart */}
+            <div className="mb-6">
+              <label className="label-field">Sizes (comma-separated)</label>
+              <input
+                className="admin-input"
+                name="sizes"
+                value={form.sizes}
+                onChange={handleChange}
+                placeholder="S, M, L, XL — leave empty for one-size products"
+              />
+              <p className="mt-1.5 text-[11px] text-muted">
+                Leave empty for accessories (mugs, picks, …). Customers must pick a size for
+                products that list one.
+              </p>
+            </div>
+
             <div className="flex items-center gap-3">
               <button onClick={handleSave} disabled={loading} className="admin-btn-primary">
                 {loading ? "Saving..." : "Save Product"}
@@ -253,41 +276,45 @@ export default function AdminProductsClient({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b-2 border-[#3f3b35] text-xs uppercase tracking-wider text-[#9e978e]">
+            <tr className="border-b-2 border-line text-xs uppercase tracking-wider text-muted">
               <th className="text-left py-3 pr-4">Product</th>
               <th className="text-left py-3 pr-4">Category</th>
               <th className="text-right py-3 pr-4">Price</th>
               <th className="text-right py-3 pr-4">Stock</th>
+              <th className="text-left py-3 pr-4">Sizes</th>
               <th className="text-right py-3">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="border-b border-[#3f3b35] hover:bg-[#282521] transition">
+              <tr key={p.id} className="border-b border-line hover:bg-surface transition">
                 <td className="py-3 pr-4">
-                  <p className="font-bold text-[#f2ede4]">{p.name_en}</p>
-                  <p className="text-xs text-[#9e978e]">{p.id}</p>
+                  <p className="font-bold text-ink">{p.name_en}</p>
+                  <p className="text-xs text-muted">{p.id}</p>
                 </td>
-                <td className="py-3 pr-4 text-[#9e978e]">{catName(p.category_id)}</td>
-                <td className="py-3 pr-4 text-right text-[#f2ede4]">EGP {p.price}</td>
+                <td className="py-3 pr-4 text-muted">{catName(p.category_id)}</td>
+                <td className="py-3 pr-4 text-right text-ink">EGP {p.price}</td>
                 <td className="py-3 pr-4 text-right">
                   <span
-                    className={`font-bold ${p.quantity === 0 ? "text-[#dc2626]" : p.quantity <= 5 ? "text-[#d97706]" : "text-[#2ea043]"}`}
+                    className={`font-bold ${p.quantity === 0 ? "text-danger" : p.quantity <= 5 ? "text-warning" : "text-success"}`}
                   >
                     {p.quantity}
                   </span>
+                </td>
+                <td className="py-3 pr-4 text-left text-xs text-muted">
+                  {p.sizes && p.sizes.length > 0 ? p.sizes.join(", ") : "—"}
                 </td>
                 <td className="py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => openEdit(p)}
-                      className="text-xs px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                      className="text-xs px-3 py-1.5 border border-line hover:border-brand text-ink uppercase font-heading tracking-wider transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(p.id)}
-                      className="text-xs px-3 py-1.5 border border-[#dc2626] text-[#dc2626] hover:bg-[#dc2626]/10 uppercase font-heading tracking-wider transition"
+                      className="text-xs px-3 py-1.5 border border-danger text-danger hover:bg-danger/10 uppercase font-heading tracking-wider transition"
                     >
                       Delete
                     </button>
@@ -298,7 +325,7 @@ export default function AdminProductsClient({
           </tbody>
         </table>
         {products.length === 0 && (
-          <p className="text-center py-12 text-[#9e978e] uppercase font-heading">
+          <p className="text-center py-12 text-muted uppercase font-heading">
             No products yet. Add your first product above.
           </p>
         )}

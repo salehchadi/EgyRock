@@ -9,11 +9,12 @@ function rowToCategory(row: string[]): Category {
     name_en: row[1] || "",
     name_ar: row[2] || "",
     name_fr: row[3] || "",
+    parent_id: row[4] || "",
   };
 }
 
 function categoryToRow(c: Category): any[] {
-  return [c.id, c.name_en, c.name_ar, c.name_fr];
+  return [c.id, c.name_en, c.name_ar, c.name_fr, c.parent_id || ""];
 }
 
 export async function getCategories(): Promise<Category[]> {

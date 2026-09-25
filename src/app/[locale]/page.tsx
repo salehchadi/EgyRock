@@ -2,65 +2,38 @@ import React from "react";
 import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { getHomepageImages } from "@/lib/data/homepageImages";
-import { getCategories } from "@/lib/data/categories";
 import { getProducts } from "@/lib/data/products";
-import { HeroCarousel } from "@/components/home/HeroCarousel";
-import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { PosterBadge } from "@/components/ui/PosterBadge";
 import { calculateStockStatus } from "@/lib/stock";
 
 export const revalidate = 0; // Ensure fresh live data on page refresh
 
+/**
+ * Mobile-first homepage: the FIRST (and only) section is the product strip,
+ * scrollable left/right with touch swipe, arrow keys, or the scrollbar.
+ * The previous hero / category / featured sections have been removed.
+ */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
   // Fetch live data strictly from Data Access Layer server-side
-  const [slides, categories, allProducts] = await Promise.all([
-    getHomepageImages(),
-    getCategories(),
-    getProducts(),
-  ]);
+  const allProducts = await getProducts();
 
   const isArabic = locale === "ar";
-  const featured = allProducts.slice(0, 4);
 
   return (
-    <div className="space-y-16 pb-20">
-      {/* 1. Dynamic Hero Section (3 Rotating Slides) */}
-      <HeroCarousel slides={slides} locale={locale} />
-
-      {/* 2. Shop By Category (Live categories from database) */}
-      <CategoryGrid categories={categories} locale={locale} />
-
-      {/* 3. Featured Physical Merch & Courses */}
-      {featured.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-l-4 rtl:border-l-0 rtl:border-r-4 border-[#e0562c] pl-4 rtl:pl-0 rtl:pr-4 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#e0562c] block mb-1">
-                Authentic Physical Drops
-              </span>
-              <h2
-                className={`text-3xl sm:text-5xl font-extrabold uppercase text-[#f2ede4] tracking-tight ${
-                  isArabic ? "font-arabic-heading" : "font-heading"
-                }`}
-              >
-                {isArabic ? "أحدث إصدارات الأندر جراوند" : "LATEST UNDERGROUND DROPS"}
-              </h2>
-            </div>
-
-            <Link
-              href="/catalog"
-              className="text-xs font-heading uppercase tracking-wider text-[#e0562c] hover:underline"
-            >
-              {isArabic ? "عرض جميع المنتجات" : "VIEW FULL CATALOG"} &rarr;
-            </Link>
+    <div className="pb-10">
+      <section aria-label="Products" className="w-full">
+        {allProducts.length === 0 ? (
+          <div className="max-w-7xl mx-auto px-4 py-16 text-center bg-surface border-2 border-line">
+            <p className="text-lg font-heading uppercase text-ink">
+              {isArabic ? "لا توجد منتجات بعد" : "NO PRODUCTS YET"}
+            </p>
           </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featured.map((product) => {
+        ) : (
+          <div className="horizontal-scroll px-4 sm:px-6 lg:px-8 py-6">
+            {allProducts.map((product) => {
               const stock = calculateStockStatus(product.quantity);
               const isOut = stock.status === "out_of_stock";
               const title = isArabic
@@ -72,64 +45,63 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               const imageSrc = product.images?.[0] || "/images/placeholders/egyrock-1.jpeg";
 
               return (
-                <div
+                <Link
                   key={product.id}
-                  className={`underground-card p-4 flex flex-col justify-between group ${
+                  href={`/catalog/${product.id}`}
+                  className={`underground-card p-3 sm:p-4 flex flex-col w-[68vw] max-w-[300px] sm:w-[45vw] lg:w-[22rem] group transition-all block ${
                     isOut ? "opacity-60 grayscale-[30%]" : ""
                   }`}
                 >
-                  <div>
-                    <div className="relative aspect-square w-full overflow-hidden bg-[#141210] border border-[#3f3b35] mb-4">
-                      <Image
-                        src={imageSrc}
-                        alt={title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  <div className="relative aspect-square w-full overflow-hidden bg-sunken border border-line mb-3 sm:mb-4">
+                    <Image
+                      src={imageSrc}
+                      alt={title}
+                      fill
+                      sizes="(max-width: 640px) 68vw, (max-width: 1024px) 45vw, 22rem"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 z-10">
+                      <PosterBadge
+                        status={stock.status}
+                        quantity={stock.quantity}
+                        locale={locale}
+                        size="sm"
                       />
-                      <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 z-10">
-                        <PosterBadge
-                          status={stock.status}
-                          quantity={stock.quantity}
-                          locale={locale}
-                          size="sm"
-                        />
-                      </div>
                     </div>
-
-                    <span className="text-[11px] font-mono text-[#e0562c] uppercase font-bold block mb-1">
-                      {product.category_id}
-                    </span>
-
-                    <h3
-                      className={`text-lg uppercase text-[#f2ede4] group-hover:text-[#e0562c] transition leading-snug line-clamp-2 ${
-                        isArabic ? "font-arabic-heading font-bold" : "font-heading"
-                      }`}
-                    >
-                      {title}
-                    </h3>
                   </div>
 
-                  <div className="pt-4 border-t border-[#3f3b35] mt-4 flex items-center justify-between">
-                    <span className="font-heading text-xl text-[#f2ede4]">
+                  <span className="text-[11px] font-mono text-brand uppercase font-bold block mb-1">
+                    {product.category_id}
+                  </span>
+
+                  <h2
+                    className={`text-base sm:text-lg uppercase text-ink group-hover:text-brand transition leading-snug line-clamp-2 ${
+                      isArabic ? "font-arabic-heading font-bold" : "font-heading"
+                    }`}
+                  >
+                    {title}
+                  </h2>
+
+                  <div className="pt-3 border-t border-line mt-auto flex items-center justify-between gap-2">
+                    <span className="font-heading text-lg sm:text-xl text-ink whitespace-nowrap">
                       {product.price} {isArabic ? "ج.م" : "EGP"}
                     </span>
-                    <Link
-                      href={`/catalog/${product.id}`}
+                    <span
                       className={`text-xs font-heading uppercase tracking-wider px-3 py-1.5 border transition ${
                         isOut
-                          ? "border-[#3f3b35] text-[#9e978e]"
-                          : "border-[#e0562c] text-[#e0562c] hover:bg-[#e0562c] hover:text-white"
+                          ? "border-line text-muted"
+                          : "border-brand text-brand group-hover:bg-brand group-hover:text-white"
                       }`}
                     >
                       {isOut ? (isArabic ? "نفد" : "SOLD OUT") : isArabic ? "تفاصيل" : "DETAILS"}
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
-        </section>
-      )}
+        )}
+      </section>
     </div>
   );
 }

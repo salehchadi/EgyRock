@@ -117,22 +117,22 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
         <div>
           <a
             href={`/${locale}/admin`}
-            className="text-xs text-[#9e978e] hover:text-[#e0562c] uppercase tracking-widest"
+            className="text-xs text-muted hover:text-brand uppercase tracking-widest"
           >
             ← Dashboard
           </a>
-          <h1 className="text-3xl font-heading uppercase text-[#f2ede4] mt-1">Dynamic Pages</h1>
+          <h1 className="text-3xl font-heading uppercase text-ink mt-1">Dynamic Pages</h1>
         </div>
         <button
           onClick={openCreate}
-          className="px-5 py-2.5 bg-[#e0562c] hover:bg-[#c44721] text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
+          className="px-5 py-2.5 bg-brand hover:bg-brand-strong text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
         >
           + Add Page
         </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold">
+        <div className="p-3 bg-danger/15 border border-danger text-danger text-xs uppercase font-bold">
           {error}
         </div>
       )}
@@ -140,8 +140,8 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
       {/* Modal Form */}
       {(creating || editing) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="bg-[#282521] border-2 border-[#e0562c] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_#e0562c]">
-            <h2 className="text-xl font-heading uppercase text-[#f2ede4] mb-4">
+          <div className="bg-surface border-2 border-brand w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_var(--color-brand)]">
+            <h2 className="text-xl font-heading uppercase text-ink mb-4">
               {editing ? "Edit Page" : "New Page"}
             </h2>
 
@@ -166,9 +166,9 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
                       name="is_published"
                       checked={form.is_published}
                       onChange={handleChange}
-                      className="w-4 h-4 accent-[#e0562c]"
+                      className="w-4 h-4 accent-brand"
                     />
-                    <span className="text-xs uppercase font-heading tracking-wider text-[#f2ede4]">
+                    <span className="text-xs uppercase font-heading tracking-wider text-ink">
                       Published
                     </span>
                   </label>
@@ -224,7 +224,7 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b-2 border-[#3f3b35] text-xs uppercase tracking-wider text-[#9e978e]">
+            <tr className="border-b-2 border-line text-xs uppercase tracking-wider text-muted">
               <th className="text-left py-3 pr-4">Slug</th>
               <th className="text-left py-3 pr-4">Title (EN)</th>
               <th className="text-left py-3 pr-4">Title (AR)</th>
@@ -234,12 +234,12 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
           </thead>
           <tbody>
             {pages.map((p) => (
-              <tr key={p.id} className="border-b border-[#3f3b35] hover:bg-[#282521] transition">
+              <tr key={p.id} className="border-b border-line hover:bg-surface transition">
                 <td className="py-3 pr-4">
-                  <span className="font-mono text-xs text-[#e0562c]">/p/{p.slug}</span>
+                  <span className="font-mono text-xs text-brand">/p/{p.slug}</span>
                 </td>
-                <td className="py-3 pr-4 text-[#f2ede4] font-bold">{p.title_en}</td>
-                <td className="py-3 pr-4 text-[#f2ede4]" dir="rtl">
+                <td className="py-3 pr-4 text-ink font-bold">{p.title_en}</td>
+                <td className="py-3 pr-4 text-ink" dir="rtl">
                   {p.title_ar || "—"}
                 </td>
                 <td className="py-3 pr-4">
@@ -253,13 +253,13 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => openEdit(p)}
-                      className="text-xs px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                      className="text-xs px-3 py-1.5 border border-line hover:border-brand text-ink uppercase font-heading tracking-wider transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(p.id)}
-                      className="text-xs px-3 py-1.5 border border-[#dc2626] text-[#dc2626] hover:bg-[#dc2626]/10 uppercase font-heading tracking-wider transition"
+                      className="text-xs px-3 py-1.5 border border-danger text-danger hover:bg-danger/10 uppercase font-heading tracking-wider transition"
                     >
                       Delete
                     </button>
@@ -270,7 +270,7 @@ export default function AdminPagesClient({ pages: initialPages, locale }: Props)
           </tbody>
         </table>
         {pages.length === 0 && (
-          <p className="text-center py-12 text-[#9e978e] uppercase font-heading">
+          <p className="text-center py-12 text-muted uppercase font-heading">
             No pages yet. Add your first page above.
           </p>
         )}

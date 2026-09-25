@@ -117,22 +117,22 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
         <div>
           <a
             href={`/${locale}/admin`}
-            className="text-xs text-[#9e978e] hover:text-[#e0562c] uppercase tracking-widest"
+            className="text-xs text-muted hover:text-brand uppercase tracking-widest"
           >
             ← Dashboard
           </a>
-          <h1 className="text-3xl font-heading uppercase text-[#f2ede4] mt-1">Homepage Hero</h1>
+          <h1 className="text-3xl font-heading uppercase text-ink mt-1">Homepage Hero</h1>
         </div>
         <button
           onClick={openCreate}
-          className="px-5 py-2.5 bg-[#e0562c] hover:bg-[#c44721] text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
+          className="px-5 py-2.5 bg-brand hover:bg-brand-strong text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
         >
           + Add Slide
         </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold">
+        <div className="p-3 bg-danger/15 border border-danger text-danger text-xs uppercase font-bold">
           {error}
         </div>
       )}
@@ -140,8 +140,8 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
       {/* Modal Form */}
       {(creating || editing) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="bg-[#282521] border-2 border-[#e0562c] w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_#e0562c]">
-            <h2 className="text-xl font-heading uppercase text-[#f2ede4] mb-4">
+          <div className="bg-surface border-2 border-brand w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_var(--color-brand)]">
+            <h2 className="text-xl font-heading uppercase text-ink mb-4">
               {editing ? "Edit Slide" : "New Slide"}
             </h2>
 
@@ -220,9 +220,9 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
         {images.map((img) => (
           <div
             key={img.id}
-            className="underground-card border-2 !border-[#3f3b35] p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+            className="underground-card border-2 !border-line p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
           >
-            <div className="w-full sm:w-40 h-24 flex-shrink-0 bg-[#1c1a17] border border-[#3f3b35] overflow-hidden">
+            <div className="w-full sm:w-40 h-24 flex-shrink-0 bg-canvas border border-line overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.image_url}
@@ -233,20 +233,20 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
             <div className="flex-1 min-w-0 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="admin-status-pending">#{img.sort_order}</span>
-                <span className="font-heading text-sm uppercase text-[#f2ede4] truncate">
+                <span className="font-heading text-sm uppercase text-ink truncate">
                   {img.title_en || "(no headline)"}
                 </span>
               </div>
               {img.title_ar && (
-                <p className="text-xs text-[#9e978e]" dir="rtl">
+                <p className="text-xs text-muted" dir="rtl">
                   {img.title_ar}
                 </p>
               )}
-              <p className="text-xs text-[#9e978e] truncate font-mono" dir="ltr">
+              <p className="text-xs text-muted truncate font-mono" dir="ltr">
                 {img.image_url}
               </p>
               {img.link_url && (
-                <p className="text-xs text-[#e0562c] truncate font-mono" dir="ltr">
+                <p className="text-xs text-brand truncate font-mono" dir="ltr">
                   → {img.link_url}
                 </p>
               )}
@@ -254,13 +254,13 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => openEdit(img)}
-                className="text-xs px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                className="text-xs px-3 py-1.5 border border-line hover:border-brand text-ink uppercase font-heading tracking-wider transition"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(img.id)}
-                className="text-xs px-3 py-1.5 border border-[#dc2626] text-[#dc2626] hover:bg-[#dc2626]/10 uppercase font-heading tracking-wider transition"
+                className="text-xs px-3 py-1.5 border border-danger text-danger hover:bg-danger/10 uppercase font-heading tracking-wider transition"
               >
                 Delete
               </button>
@@ -269,7 +269,7 @@ export default function AdminHeroClient({ images: initialImages, locale }: Props
         ))}
 
         {images.length === 0 && (
-          <p className="text-center py-12 text-[#9e978e] uppercase font-heading">
+          <p className="text-center py-12 text-muted uppercase font-heading">
             No hero slides yet. Add your first slide above.
           </p>
         )}

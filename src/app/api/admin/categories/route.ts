@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       name_en: body.name_en,
       name_ar: body.name_ar || body.name_en,
       name_fr: body.name_fr || body.name_en,
+      parent_id: body.parent_id || "",
     });
     return NextResponse.json({ category }, { status: 201 });
   } catch (e: any) {

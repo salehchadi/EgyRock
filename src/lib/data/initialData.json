@@ -12,7 +12,8 @@
       "price",
       "quantity",
       "images",
-      "created_at"
+      "created_at",
+      "sizes"
     ],
     [
       "course-guitar-mastery-vol1",
@@ -240,15 +241,29 @@
     ]
   ],
   "Categories": [
-    ["id", "name_en", "name_ar", "name_fr"],
-    ["courses", "Physical Courses", "دورات ملموسة", "Formations Physiques"],
-    ["tshirts", "T-Shirts", "تيشيرتات", "T-Shirts"],
-    ["mugs", "Mugs", "ماجات", "Mugs"],
-    ["accessories", "Accessories", "إكسسوارات", "Accessoires"],
-    ["CAT-1789394169444-af4og8p21", "Courses", "دورات", "Cours"],
-    ["CAT-1789394169446-kj8x79p6q", "T-shirts", "تيشيرتات", "T-shirts"],
-    ["CAT-1789394169454-2w7hhelwl", "Mugs", "أكواب", "Tasses"],
-    ["CAT-1789394169455-fkf65y6aa", "Accessories", "إكسسوارات", "Accessoires"]
+    ["id", "name_en", "name_ar", "name_fr", "parent_id"],
+    ["courses", "Physical Courses", "دورات ملموسة", "Formations Physiques", ""],
+    ["tshirts", "T-Shirts", "تيشيرتات", "T-Shirts", ""],
+    ["mugs", "Mugs", "ماجات", "Mugs", ""],
+    ["accessories", "Accessories", "إكسسوارات", "Accessoires", ""],
+    ["CAT-1789394169444-af4og8p21", "Courses", "دورات", "Cours", ""],
+    ["CAT-1789394169446-kj8x79p6q", "T-shirts", "تيشيرتات", "T-shirts", ""],
+    ["CAT-1789394169454-2w7hhelwl", "Mugs", "أكواب", "Tasses", ""],
+    ["CAT-1789394169455-fkf65y6aa", "Accessories", "إكسسوارات", "Accessoires", ""]
+  ],
+  "Coupons": [
+    [
+      "id",
+      "code",
+      "type",
+      "value",
+      "min_order",
+      "active",
+      "usage_limit",
+      "used_count",
+      "expires_at",
+      "created_at"
+    ]
   ],
   "Orders": [
     [
@@ -262,11 +277,24 @@
       "status",
       "receipt_image_url",
       "created_at",
-      "confirmed_at"
+      "confirmed_at",
+      "coupon_code",
+      "discount"
     ]
   ],
   "Users": [
-    ["id", "email", "password_hash", "name", "role", "created_at"],
+    [
+      "id",
+      "email",
+      "password_hash",
+      "name",
+      "role",
+      "created_at",
+      "phone",
+      "address",
+      "gender",
+      "age"
+    ],
     [
       "USR-MU192IVS-851",
       "admin@egyrock.local",

@@ -16,7 +16,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square w-full overflow-hidden bg-[#141210] border-2 border-[#3f3b35] shadow-[6px_6px_0px_#e0562c]">
+      <div className="relative aspect-square w-full overflow-hidden bg-sunken border-2 border-line shadow-[6px_6px_0px_var(--color-brand)]">
         <Image
           src={activeImage}
           alt={title}
@@ -28,7 +28,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
 
         {/* Image Counter */}
         {images.length > 1 && (
-          <div className="absolute bottom-3 right-3 rtl:right-auto rtl:left-3 bg-black/70 border border-[#3f3b35] px-2.5 py-1 text-xs font-mono text-[#f2ede4]">
+          <div className="absolute bottom-3 right-3 rtl:right-auto rtl:left-3 bg-black/70 border border-line px-2.5 py-1 text-xs font-mono text-ink">
             {activeIndex + 1} / {images.length}
           </div>
         )}
@@ -38,7 +38,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
           <>
             <button
               onClick={() => setActiveIndex((i) => (i === 0 ? images.length - 1 : i - 1))}
-              className="absolute left-2 rtl:left-auto rtl:right-2 top-1/2 -translate-y-1/2 bg-black/60 border border-[#3f3b35] p-2 text-[#f2ede4] hover:bg-[#e0562c] hover:border-[#e0562c] transition cursor-pointer"
+              className="absolute left-2 rtl:left-auto rtl:right-2 top-1/2 -translate-y-1/2 bg-black/60 border border-line p-2 text-ink hover:bg-brand hover:border-brand transition cursor-pointer"
               aria-label="Previous image"
             >
               <svg
@@ -59,7 +59,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             </button>
             <button
               onClick={() => setActiveIndex((i) => (i === images.length - 1 ? 0 : i + 1))}
-              className="absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2 bg-black/60 border border-[#3f3b35] p-2 text-[#f2ede4] hover:bg-[#e0562c] hover:border-[#e0562c] transition cursor-pointer"
+              className="absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2 bg-black/60 border border-line p-2 text-ink hover:bg-brand hover:border-brand transition cursor-pointer"
               aria-label="Next image"
             >
               <svg
@@ -91,8 +91,8 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
               onClick={() => setActiveIndex(idx)}
               className={`relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 overflow-hidden border-2 transition cursor-pointer ${
                 idx === activeIndex
-                  ? "border-[#e0562c] shadow-[2px_2px_0px_#e0562c]"
-                  : "border-[#3f3b35] hover:border-[#9e978e] opacity-60 hover:opacity-100"
+                  ? "border-brand shadow-[2px_2px_0px_var(--color-brand)]"
+                  : "border-line hover:border-muted opacity-60 hover:opacity-100"
               }`}
               aria-label={`View image ${idx + 1}`}
             >

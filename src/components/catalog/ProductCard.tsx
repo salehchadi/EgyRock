@@ -38,7 +38,7 @@ export function ProductCard({ product, locale }: ProductCardProps) {
       <div>
         <Link
           href={`/catalog/${product.id}`}
-          className="relative aspect-square w-full overflow-hidden bg-[#141210] border border-[#3f3b35] block mb-4"
+          className="relative aspect-square w-full overflow-hidden bg-sunken border border-line block mb-4"
         >
           <Image
             src={imageSrc}
@@ -57,13 +57,13 @@ export function ProductCard({ product, locale }: ProductCardProps) {
         </Link>
 
         <div className="space-y-1.5">
-          <span className="text-[11px] font-mono text-[#e0562c] uppercase font-bold tracking-wider">
+          <span className="text-[11px] font-mono text-brand uppercase font-bold tracking-wider">
             {product.category_id}
           </span>
 
           <Link href={`/catalog/${product.id}`}>
             <h3
-              className={`text-lg uppercase text-[#f2ede4] group-hover:text-[#e0562c] transition leading-snug line-clamp-2 ${
+              className={`text-lg uppercase text-ink group-hover:text-brand transition leading-snug line-clamp-2 ${
                 isArabic ? "font-arabic-heading font-bold" : "font-heading"
               }`}
             >
@@ -71,16 +71,16 @@ export function ProductCard({ product, locale }: ProductCardProps) {
             </h3>
           </Link>
 
-          <p className="text-xs text-[#9e978e] line-clamp-2 leading-relaxed">{desc}</p>
+          <p className="text-xs text-muted line-clamp-2 leading-relaxed">{desc}</p>
         </div>
       </div>
 
-      <div className="pt-4 border-t border-[#3f3b35] mt-4 flex items-center justify-between">
+      <div className="pt-4 border-t border-line mt-4 flex items-center justify-between">
         <div>
-          <span className="text-xs text-[#9e978e] block uppercase font-mono">
+          <span className="text-xs text-muted block uppercase font-mono">
             {isArabic ? "السعر" : "PRICE"}
           </span>
-          <span className="font-heading text-xl text-[#f2ede4]">
+          <span className="font-heading text-xl text-ink">
             {product.price} {isArabic ? "ج.م" : "EGP"}
           </span>
         </div>
@@ -89,8 +89,8 @@ export function ProductCard({ product, locale }: ProductCardProps) {
           href={`/catalog/${product.id}`}
           className={`text-xs font-heading uppercase tracking-wider px-3.5 py-2 border transition ${
             isOut
-              ? "border-[#3f3b35] text-[#9e978e] pointer-events-none cursor-not-allowed"
-              : "border-[#e0562c] text-[#e0562c] hover:bg-[#e0562c] hover:text-white cursor-pointer shadow-[2px_2px_0px_#e0562c]"
+              ? "border-line text-muted pointer-events-none cursor-not-allowed"
+              : "border-brand text-brand hover:bg-brand hover:text-white cursor-pointer shadow-[2px_2px_0px_var(--color-brand)]"
           }`}
         >
           {isOut ? (isArabic ? "نفد" : "SOLD OUT") : isArabic ? "عرض المنتج" : "VIEW ITEM"}

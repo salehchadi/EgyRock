@@ -3,18 +3,74 @@ import { LOCALES, findInStockProductId, readCartTotalQuantity } from "./support/
 
 test.describe("Storefront browsing across all three locales", () => {
   for (const locale of LOCALES) {
-    test(`[${locale}] homepage renders the category grid`, async ({ page }) => {
+    test(`[${locale}] homepage leads with the scrollable product strip`, async ({ page }) => {
       const response = await page.goto(`/${locale}`);
 
       expect(response?.status(), "homepage should not error").toBeLessThan(400);
       await expect(page.locator("body")).toBeVisible();
 
-      // Category names come from the Categories sheet, not hardcoded markup.
-      const categoryLinks = page.locator('a[href*="category="]');
-      await expect(categoryLinks.first()).toBeVisible({ timeout: 20_000 });
-      expect(await categoryLinks.count()).toBeGreaterThan(0);
+      // The product strip is the FIRST thing on the page: no hero, no category grid.
+      const firstSection = page.locator("main > *").first();
+      const firstProductLink = firstSection.locator('a[href*="/catalog/"]').first();
+      await expect(firstProductLink).toBeVisible({ timeout: 20_000 });
+
+      // …and it scrolls horizontally rather than stacking vertically.
+      const strip = page.locator(".horizontal-scroll").first();
+      await expect(strip).toBeVisible();
+      const scrollWidth = await strip.evaluate((el) => el.scrollWidth);
+      const clientWidth = await strip.evaluate((el) => el.clientWidth);
+      expect(scrollWidth).toBeGreaterThan(clientWidth);
     });
   }
+
+  for (const locale of LOCALES) {
+    test(`[${locale}] menu drawer lists categories with collapsible sub-categories`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}`);
+      await page.getByRole("button", { name: "Open menu" }).click();
+
+      const drawer = page.getByRole("dialog", { name: "Menu" });
+      await expect(drawer).toBeVisible();
+
+      // Category links come from the Categories sheet, not hardcoded markup.
+      const categoryLinks = drawer.locator('a[href*="category="]');
+      await expect(categoryLinks.first()).toBeVisible({ timeout: 20_000 });
+      const beforeExpand = await categoryLinks.count();
+      expect(beforeExpand).toBeGreaterThan(0);
+
+      // If any top-level category has children, expanding it reveals them.
+      const expandButton = drawer.getByRole("button", { name: /expand/i }).first();
+      if ((await expandButton.count()) > 0) {
+        await expandButton.click();
+        await expect
+          .poll(() => categoryLinks.count(), { timeout: 10_000 })
+          .toBeGreaterThan(beforeExpand);
+      }
+    });
+  }
+
+  test("the menu drawer opens from the left in LTR and from the right in RTL", async ({ page }) => {
+    const viewport = page.viewportSize()!;
+    const panel = page.getByTestId("menu-drawer-panel");
+    const openMenu = () => page.getByRole("button", { name: "Open menu" }).click();
+
+    // English (LTR) → drawer slides in from the left edge.
+    await page.goto("/en");
+    await openMenu();
+    await expect(panel).toBeVisible();
+    let box = (await panel.boundingBox())!;
+    expect(box.x).toBeLessThan(viewport.width / 2);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+
+    // Arabic (RTL) → drawer slides in from the right edge.
+    await page.goto("/ar");
+    await openMenu();
+    await expect(panel).toBeVisible();
+    box = (await panel.boundingBox())!;
+    expect(box.x + box.width).toBeGreaterThan(viewport.width / 2);
+    expect(box.x).toBeGreaterThanOrEqual(-1);
+  });
 
   for (const locale of LOCALES) {
     test(`[${locale}] catalog cards link to detail pages`, async ({ page }) => {

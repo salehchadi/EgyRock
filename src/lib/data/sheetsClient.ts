@@ -18,8 +18,9 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "quantity",
     "images",
     "created_at",
+    "sizes",
   ],
-  Categories: ["id", "name_en", "name_ar", "name_fr"],
+  Categories: ["id", "name_en", "name_ar", "name_fr", "parent_id"],
   Orders: [
     "id",
     "user_id",
@@ -32,8 +33,33 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "receipt_image_url",
     "created_at",
     "confirmed_at",
+    "coupon_code",
+    "discount",
   ],
-  Users: ["id", "email", "password_hash", "name", "role", "created_at"],
+  Users: [
+    "id",
+    "email",
+    "password_hash",
+    "name",
+    "role",
+    "created_at",
+    "phone",
+    "address",
+    "gender",
+    "age",
+  ],
+  Coupons: [
+    "id",
+    "code",
+    "type",
+    "value",
+    "min_order",
+    "active",
+    "usage_limit",
+    "used_count",
+    "expires_at",
+    "created_at",
+  ],
   HomepageImages: ["id", "image_url", "link_url", "title_en", "title_ar", "sort_order"],
   Translations: ["key", "en", "ar", "fr"],
   Pages: [
@@ -141,6 +167,41 @@ function saveLocalDb(data: Record<string, any[][]>) {
   }
 }
 
+/**
+ * Keeps a stored tab aligned with the current `TAB_HEADERS` schema.
+ *
+ * Local dev databases created before a column was introduced (e.g. `sizes` on
+ * Products, `parent_id` on Categories, `coupon_code`/`discount` on Orders) would
+ * otherwise shift values into the wrong columns. Existing rows are re-mapped by
+ * header name onto the expected order, and missing columns become empty strings.
+ * Row count and order are never changed, so 1-based sheet row indices stay valid.
+ */
+function reconcileHeaders(tabName: string, db: Record<string, any[][]>): any[][] {
+  const expected = TAB_HEADERS[tabName] || [];
+  const rows = db[tabName] || [];
+  if (expected.length === 0 || rows.length === 0) return rows;
+
+  const current = rows[0] || [];
+  const alreadyAligned =
+    current.length === expected.length && expected.every((h, i) => current[i] === h);
+  if (alreadyAligned) return rows;
+
+  const migrated: any[][] = [
+    expected.slice(),
+    ...rows.slice(1).map((row) =>
+      expected.map((header) => {
+        const at = current.indexOf(header);
+        return at === -1 ? "" : (row[at] ?? "");
+      }),
+    ),
+  ];
+
+  db[tabName] = migrated;
+  saveLocalDb(db);
+  console.info(`[DAL] Migrated fallback tab "${tabName}" to the current column schema.`);
+  return migrated;
+}
+
 export async function readTab(tabName: string): Promise<string[][]> {
   if (isGoogleSheetsConfigured()) {
     try {
@@ -170,11 +231,12 @@ export async function readTab(tabName: string): Promise<string[][]> {
 
   // Fallback to local persistent JSON / in-memory store
   const db = getLocalDb();
-  if (!db[tabName]) {
+  if (!db[tabName] || db[tabName].length === 0) {
     db[tabName] = [TAB_HEADERS[tabName] || []];
     saveLocalDb(db);
   }
-  return (db[tabName] || []).map((row) => row.map((c) => String(c ?? "")));
+  const rows = reconcileHeaders(tabName, db);
+  return (rows || []).map((row) => row.map((c) => String(c ?? "")));
 }
 
 export async function appendRow(tabName: string, rowValues: any[]): Promise<void> {

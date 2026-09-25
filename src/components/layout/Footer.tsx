@@ -20,25 +20,25 @@ export async function Footer() {
   }
 
   return (
-    <footer className="border-t-2 border-[#3f3b35] bg-[#141210] py-12 px-4 sm:px-6 lg:px-8 text-[#9e978e] text-sm">
+    <footer className="border-t-2 border-line bg-sunken py-12 px-4 sm:px-6 lg:px-8 text-muted text-sm">
       <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3 items-start">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <span className="font-heading text-xl text-[#f2ede4] tracking-wider uppercase">
+          <span className="font-heading text-xl text-ink tracking-wider uppercase">
             {brandT("name")}
           </span>
-          <span className="text-xs px-2 py-0.5 border border-[#3f3b35] text-[#e0562c]">
+          <span className="text-xs px-2 py-0.5 border border-line text-brand">
             {brandT("tagline")}
           </span>
         </div>
 
         {/* Dynamic page links from DB */}
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs uppercase font-heading tracking-wider">
-          <Link href="/catalog" className="hover:text-[#f2ede4] transition">
+          <Link href="/catalog" className="hover:text-ink transition">
             Catalog
           </Link>
           {publishedPages.map((p) => (
-            <Link key={p.id} href={`/pages/${p.slug}`} className="hover:text-[#e0562c] transition">
+            <Link key={p.id} href={`/pages/${p.slug}`} className="hover:text-brand transition">
               {p[`title_${lang}`] || p.title_en}
             </Link>
           ))}
@@ -47,7 +47,7 @@ export async function Footer() {
         {/* Legal / payment notice */}
         <div className="text-center md:text-end text-xs space-y-1">
           <p>{t("copyright")}</p>
-          <p className="text-[#e0562c]">{t("instapayNotice")}</p>
+          <p className="text-brand">{t("instapayNotice")}</p>
         </div>
       </div>
     </footer>

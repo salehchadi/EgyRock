@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Products", path: "/admin/products", icon: "▣" },
   { label: "Categories", path: "/admin/categories", icon: "▤" },
   { label: "Orders", path: "/admin/orders", icon: "▥" },
+  { label: "Coupons", path: "/admin/coupons", icon: "★" },
   { label: "Hero Images", path: "/admin/hero", icon: "▧" },
   { label: "Pages", path: "/admin/pages", icon: "▨" },
   { label: "Translations", path: "/admin/translations", icon: "▩" },
@@ -33,11 +34,11 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Sidebar Navigation */}
-      <aside className="w-full lg:w-56 bg-[#141210] border-b lg:border-b-0 lg:border-r border-[#3f3b35] lg:min-h-screen flex-shrink-0">
-        <div className="p-4 border-b border-[#3f3b35]">
+      <aside className="w-full lg:w-56 bg-sunken border-b lg:border-b-0 lg:border-r border-line lg:min-h-screen flex-shrink-0">
+        <div className="p-4 border-b border-line">
           <Link href="/" className="block">
-            <span className="text-xl font-heading text-[#e0562c] tracking-wider">EGYROCK</span>
-            <span className="block text-[10px] uppercase tracking-[0.2em] text-[#9e978e] mt-0.5">
+            <span className="text-xl font-heading text-brand tracking-wider">EGYROCK</span>
+            <span className="block text-[10px] uppercase tracking-[0.2em] text-muted mt-0.5">
               Admin Panel
             </span>
           </Link>
@@ -48,18 +49,18 @@ export default async function AdminLayout({
             <Link
               key={item.path}
               href={item.path}
-              className="flex items-center gap-2.5 px-3 py-2.5 text-xs uppercase tracking-wider text-[#9e978e] hover:text-[#f2ede4] hover:bg-[#282521] transition whitespace-nowrap font-heading"
+              className="flex items-center gap-2.5 px-3 py-2.5 text-xs uppercase tracking-wider text-muted hover:text-ink hover:bg-surface transition whitespace-nowrap font-heading"
             >
-              <span className="text-[#e0562c] text-sm">{item.icon}</span>
+              <span className="text-brand text-sm">{item.icon}</span>
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden lg:block mt-auto p-4 border-t border-[#3f3b35]">
+        <div className="hidden lg:block mt-auto p-4 border-t border-line">
           <Link
             href="/"
-            className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-[#9e978e] hover:text-[#e0562c] transition"
+            className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted hover:text-brand transition"
           >
             ← View Storefront
           </Link>

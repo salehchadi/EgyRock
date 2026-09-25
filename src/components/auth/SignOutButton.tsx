@@ -11,7 +11,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: `/${locale}` })}
-      className="px-4 py-2.5 bg-[#1c1a17] hover:bg-[#332f2a] text-[#f2ede4] font-heading uppercase text-sm tracking-wider border border-[#3f3b35] hover:border-[#dc2626] hover:text-[#dc2626] transition cursor-pointer"
+      className="px-4 py-2.5 bg-canvas hover:bg-surface-2 text-ink font-heading uppercase text-sm tracking-wider border border-line hover:border-danger hover:text-danger transition cursor-pointer"
     >
       {isArabic ? "تسجيل الخروج" : "SIGN OUT"}
     </button>

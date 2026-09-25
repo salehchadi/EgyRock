@@ -65,12 +65,12 @@ export default function AdminTranslationsClient({
       <div>
         <a
           href={`/${locale}/admin`}
-          className="text-xs text-[#9e978e] hover:text-[#e0562c] uppercase tracking-widest"
+          className="text-xs text-muted hover:text-brand uppercase tracking-widest"
         >
           ← Dashboard
         </a>
-        <h1 className="text-3xl font-heading uppercase text-[#f2ede4] mt-1">Translations</h1>
-        <p className="text-xs text-[#9e978e] mt-1">
+        <h1 className="text-3xl font-heading uppercase text-ink mt-1">Translations</h1>
+        <p className="text-xs text-muted mt-1">
           {translations.length} keys — edit UI strings across EN / AR / FR without code.
         </p>
       </div>
@@ -84,7 +84,7 @@ export default function AdminTranslationsClient({
       />
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold">
+        <div className="p-3 bg-danger/15 border border-danger text-danger text-xs uppercase font-bold">
           {error}
         </div>
       )}
@@ -93,7 +93,7 @@ export default function AdminTranslationsClient({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b-2 border-[#3f3b35] text-xs uppercase tracking-wider text-[#9e978e]">
+            <tr className="border-b-2 border-line text-xs uppercase tracking-wider text-muted">
               <th className="text-left py-3 pr-4 w-56">Key</th>
               <th className="text-left py-3 pr-4">English</th>
               <th className="text-left py-3 pr-4">العربية</th>
@@ -104,9 +104,9 @@ export default function AdminTranslationsClient({
           <tbody>
             {filtered.map((t) =>
               editingKey === t.key ? (
-                <tr key={t.key} className="border-b border-[#e0562c]/50 bg-[#1c1a17]">
+                <tr key={t.key} className="border-b border-brand/50 bg-canvas">
                   <td className="py-2 pr-4 align-top">
-                    <span className="font-mono text-xs text-[#e0562c]">{t.key}</span>
+                    <span className="font-mono text-xs text-brand">{t.key}</span>
                   </td>
                   <td className="py-2 pr-2 align-top">
                     <input
@@ -152,13 +152,13 @@ export default function AdminTranslationsClient({
                       <button
                         onClick={() => handleSave(t.key)}
                         disabled={saving}
-                        className="text-xs px-3 py-1.5 bg-[#e0562c] hover:bg-[#c44721] text-white uppercase font-heading tracking-wider border border-black transition disabled:opacity-50"
+                        className="text-xs px-3 py-1.5 bg-brand hover:bg-brand-strong text-white uppercase font-heading tracking-wider border border-black transition disabled:opacity-50"
                       >
                         {saving ? "..." : "Save"}
                       </button>
                       <button
                         onClick={() => setEditingKey(null)}
-                        className="text-xs px-3 py-1.5 border border-[#3f3b35] text-[#9e978e] hover:text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                        className="text-xs px-3 py-1.5 border border-line text-muted hover:text-ink uppercase font-heading tracking-wider transition"
                       >
                         Cancel
                       </button>
@@ -166,19 +166,19 @@ export default function AdminTranslationsClient({
                   </td>
                 </tr>
               ) : (
-                <tr key={t.key} className="border-b border-[#3f3b35] hover:bg-[#282521] transition">
+                <tr key={t.key} className="border-b border-line hover:bg-surface transition">
                   <td className="py-3 pr-4">
-                    <span className="font-mono text-xs text-[#9e978e]">{t.key}</span>
+                    <span className="font-mono text-xs text-muted">{t.key}</span>
                   </td>
-                  <td className="py-3 pr-4 text-[#f2ede4]">{t.en || "—"}</td>
-                  <td className="py-3 pr-4 text-[#f2ede4]" dir="rtl">
+                  <td className="py-3 pr-4 text-ink">{t.en || "—"}</td>
+                  <td className="py-3 pr-4 text-ink" dir="rtl">
                     {t.ar || "—"}
                   </td>
-                  <td className="py-3 pr-4 text-[#f2ede4]">{t.fr || "—"}</td>
+                  <td className="py-3 pr-4 text-ink">{t.fr || "—"}</td>
                   <td className="py-3 text-right">
                     <button
                       onClick={() => openEdit(t)}
-                      className="text-xs px-3 py-1.5 border border-[#3f3b35] hover:border-[#e0562c] text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                      className="text-xs px-3 py-1.5 border border-line hover:border-brand text-ink uppercase font-heading tracking-wider transition"
                     >
                       Edit
                     </button>
@@ -189,7 +189,7 @@ export default function AdminTranslationsClient({
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <p className="text-center py-12 text-[#9e978e] uppercase font-heading">
+          <p className="text-center py-12 text-muted uppercase font-heading">
             No translation keys match your search.
           </p>
         )}

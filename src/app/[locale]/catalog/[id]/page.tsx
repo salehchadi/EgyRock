@@ -63,23 +63,23 @@ export default async function ProductDetailPage({
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-12">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs uppercase font-mono text-[#9e978e]">
-        <Link href="/" className="hover:text-[#f2ede4] transition">
+      <nav className="flex items-center gap-2 text-xs uppercase font-mono text-muted">
+        <Link href="/" className="hover:text-ink transition">
           {isArabic ? "الرئيسية" : isFrench ? "Accueil" : "HOME"}
         </Link>
-        <span className="text-[#3f3b35]">/</span>
-        <Link href="/catalog" className="hover:text-[#f2ede4] transition">
+        <span className="text-line">/</span>
+        <Link href="/catalog" className="hover:text-ink transition">
           {isArabic ? "الكتالوج" : isFrench ? "Catalogue" : "CATALOG"}
         </Link>
-        <span className="text-[#3f3b35]">/</span>
+        <span className="text-line">/</span>
         <Link
           href={`/catalog?category=${product.category_id}`}
-          className="hover:text-[#f2ede4] transition text-[#e0562c]"
+          className="hover:text-ink transition text-brand"
         >
           {categoryName}
         </Link>
-        <span className="text-[#3f3b35]">/</span>
-        <span className="text-[#f2ede4] truncate max-w-[200px]">{title}</span>
+        <span className="text-line">/</span>
+        <span className="text-ink truncate max-w-[200px]">{title}</span>
       </nav>
 
       {/* Product Main Section */}
@@ -91,14 +91,14 @@ export default async function ProductDetailPage({
         <div className="space-y-6">
           {/* Category Tag */}
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-mono text-[#e0562c] uppercase font-bold tracking-[0.25em] bg-[#e0562c]/10 border border-[#e0562c]/30 px-2 py-0.5">
+            <span className="text-[11px] font-mono text-brand uppercase font-bold tracking-[0.25em] bg-brand/10 border border-brand/30 px-2 py-0.5">
               {categoryName}
             </span>
           </div>
 
           {/* Title */}
           <h1
-            className={`text-3xl sm:text-4xl lg:text-5xl uppercase text-[#f2ede4] leading-tight ${
+            className={`text-3xl sm:text-4xl lg:text-5xl uppercase text-ink leading-tight ${
               isArabic ? "font-arabic-heading font-bold" : "font-heading"
             }`}
           >
@@ -114,59 +114,59 @@ export default async function ProductDetailPage({
               size="md"
             />
             {stock.status === "countdown" && (
-              <span className="text-xs text-[#d97706] font-mono animate-pulse">
+              <span className="text-xs text-warning font-mono animate-pulse">
                 {isArabic ? "اطلب الآن!" : "ORDER NOW!"}
               </span>
             )}
           </div>
 
           {/* Price */}
-          <div className="bg-[#282521] border-2 border-[#3f3b35] p-4 inline-flex items-baseline gap-3">
-            <span className="text-xs text-[#9e978e] uppercase font-mono">
+          <div className="bg-surface border-2 border-line p-4 inline-flex items-baseline gap-3">
+            <span className="text-xs text-muted uppercase font-mono">
               {isArabic ? "السعر" : isFrench ? "Prix" : "PRICE"}
             </span>
             <span
-              className={`text-3xl sm:text-4xl text-[#f2ede4] ${
+              className={`text-3xl sm:text-4xl text-ink ${
                 isArabic ? "font-arabic-heading font-bold" : "font-heading"
               }`}
             >
               {product.price}
             </span>
-            <span className="text-sm text-[#9e978e] font-mono">{isArabic ? "ج.م" : "EGP"}</span>
+            <span className="text-sm text-muted font-mono">{isArabic ? "ج.م" : "EGP"}</span>
           </div>
 
           {/* Description */}
-          <div className="border-t border-[#3f3b35] pt-5">
+          <div className="border-t border-line pt-5">
             <h2
-              className={`text-xs uppercase tracking-[0.2em] text-[#9e978e] mb-3 ${
+              className={`text-xs uppercase tracking-[0.2em] text-muted mb-3 ${
                 isArabic ? "font-arabic-heading" : "font-heading"
               }`}
             >
               {isArabic ? "الوصف" : isFrench ? "Description" : "DESCRIPTION"}
             </h2>
-            <p className="text-sm sm:text-base text-[#c5beaf] leading-relaxed whitespace-pre-line">
+            <p className="text-sm sm:text-base text-ink-dim leading-relaxed whitespace-pre-line">
               {desc}
             </p>
           </div>
 
           {/* Add to Cart Section */}
-          <div className="border-t border-[#3f3b35] pt-6">
+          <div className="border-t border-line pt-6">
             <AddToCartButton product={product} />
           </div>
 
           {/* Shipping & Payment Callout */}
-          <div className="bg-[#282521] border border-[#3f3b35] p-4 space-y-3 bg-screen-print">
+          <div className="bg-surface border border-line p-4 space-y-3 bg-screen-print">
             <div className="flex items-start gap-3">
-              <span className="text-[#e0562c] text-lg mt-0.5">📦</span>
+              <span className="text-brand text-lg mt-0.5">📦</span>
               <div>
-                <p className="text-xs font-bold uppercase text-[#f2ede4] tracking-wider">
+                <p className="text-xs font-bold uppercase text-ink tracking-wider">
                   {isArabic
                     ? "شحن مادي في جميع أنحاء مصر"
                     : isFrench
                       ? "Livraison physique partout en Égypte"
                       : "PHYSICAL SHIPPING ACROSS EGYPT"}
                 </p>
-                <p className="text-[11px] text-[#9e978e] mt-1">
+                <p className="text-[11px] text-muted mt-1">
                   {isArabic
                     ? "جميع الطلبات تشحن عبر خدمة البريد السريع. وقت التسليم: 3-7 أيام عمل."
                     : isFrench
@@ -176,26 +176,24 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            <div className="flex items-start gap-3 border-t border-[#3f3b35] pt-3">
-              <span className="text-[#e0562c] text-lg mt-0.5">💳</span>
+            <div className="flex items-start gap-3 border-t border-line pt-3">
+              <span className="text-brand text-lg mt-0.5">💳</span>
               <div>
-                <p className="text-xs font-bold uppercase text-[#f2ede4] tracking-wider">
+                <p className="text-xs font-bold uppercase text-ink tracking-wider">
                   {isArabic
                     ? "الدفع عبر InstaPay"
                     : isFrench
                       ? "Paiement via InstaPay"
                       : "PAY VIA INSTAPAY"}
                 </p>
-                <p className="text-[11px] text-[#9e978e] mt-1">
+                <p className="text-[11px] text-muted mt-1">
                   {isArabic
                     ? "أرسل المبلغ إلى egyrock@instapay ثم ارفع لقطة شاشة الإيصال أثناء الدفع."
                     : isFrench
                       ? "Envoyez le montant à egyrock@instapay puis téléchargez la capture d'écran du reçu."
                       : "Send amount to egyrock@instapay then upload receipt screenshot at checkout."}
                 </p>
-                <p className="text-[11px] text-[#e0562c] font-bold mt-1 font-mono">
-                  egyrock@instapay
-                </p>
+                <p className="text-[11px] text-brand font-bold mt-1 font-mono">egyrock@instapay</p>
               </div>
             </div>
           </div>
@@ -204,10 +202,10 @@ export default async function ProductDetailPage({
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="border-t-2 border-[#3f3b35] pt-10 space-y-6">
+        <section className="border-t-2 border-line pt-10 space-y-6">
           <div className="flex items-center justify-between">
             <h2
-              className={`text-2xl sm:text-3xl uppercase text-[#f2ede4] ${
+              className={`text-2xl sm:text-3xl uppercase text-ink ${
                 isArabic ? "font-arabic-heading font-bold" : "font-heading"
               }`}
             >
@@ -219,7 +217,7 @@ export default async function ProductDetailPage({
             </h2>
             <Link
               href={`/catalog?category=${product.category_id}`}
-              className="text-xs uppercase font-heading tracking-wider text-[#e0562c] border border-[#e0562c] px-3 py-1.5 hover:bg-[#e0562c] hover:text-white transition hidden sm:block"
+              className="text-xs uppercase font-heading tracking-wider text-brand border border-brand px-3 py-1.5 hover:bg-brand hover:text-white transition hidden sm:block"
             >
               {isArabic ? "عرض الكل" : isFrench ? "Voir tout" : "VIEW ALL"}
             </Link>
@@ -244,7 +242,7 @@ export default async function ProductDetailPage({
                     rpIsOut ? "opacity-60 grayscale-[35%]" : ""
                   }`}
                 >
-                  <div className="relative aspect-square w-full overflow-hidden bg-[#141210] border border-[#3f3b35] mb-3">
+                  <div className="relative aspect-square w-full overflow-hidden bg-sunken border border-line mb-3">
                     <Image
                       src={rpImage}
                       alt={rpTitle}
@@ -261,13 +259,13 @@ export default async function ProductDetailPage({
                     </div>
                   </div>
                   <h3
-                    className={`text-sm uppercase text-[#f2ede4] group-hover:text-[#e0562c] transition leading-snug line-clamp-2 mb-1 ${
+                    className={`text-sm uppercase text-ink group-hover:text-brand transition leading-snug line-clamp-2 mb-1 ${
                       isArabic ? "font-arabic-heading font-bold" : "font-heading"
                     }`}
                   >
                     {rpTitle}
                   </h3>
-                  <span className="font-heading text-base text-[#e0562c]">
+                  <span className="font-heading text-base text-brand">
                     {rp.price} {isArabic ? "ج.م" : "EGP"}
                   </span>
                 </Link>
@@ -281,7 +279,7 @@ export default async function ProductDetailPage({
       <div className="text-center pt-4">
         <Link
           href="/catalog"
-          className="inline-flex items-center gap-2 text-xs uppercase font-heading tracking-wider text-[#9e978e] hover:text-[#f2ede4] transition border border-[#3f3b35] px-5 py-2.5 hover:border-[#f2ede4]"
+          className="inline-flex items-center gap-2 text-xs uppercase font-heading tracking-wider text-muted hover:text-ink transition border border-line px-5 py-2.5 hover:border-ink"
         >
           <span className="rtl:rotate-180">←</span>
           {isArabic ? "العودة إلى الكتالوج" : isFrench ? "Retour au catalogue" : "BACK TO CATALOG"}

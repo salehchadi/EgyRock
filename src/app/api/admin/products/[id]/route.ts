@@ -14,10 +14,23 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const body = await req.json();
+
+    // Normalize sizes: admin form sends a comma-separated string, accept arrays too.
+    let sizes: string[] | undefined;
+    if (body.sizes !== undefined) {
+      sizes = Array.isArray(body.sizes)
+        ? body.sizes.map((s: any) => String(s).trim()).filter(Boolean)
+        : String(body.sizes)
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+    }
+
     const product = await updateProduct(id, {
       ...body,
       price: Number(body.price),
       quantity: Number(body.quantity),
+      ...(sizes !== undefined ? { sizes } : {}),
     });
     return NextResponse.json({ product });
   } catch (error: any) {

@@ -7,6 +7,7 @@ import { fontAnton, fontOswald, fontCairo, fontAlmarai } from "../fonts";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getCategories } from "@/lib/data/categories";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
@@ -34,18 +35,26 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   const isRtl = locale === "ar";
 
+  // Categories are rendered inside the menu drawer (server-fetched via DAL).
+  let categories: Awaited<ReturnType<typeof getCategories>> = [];
+  try {
+    categories = await getCategories();
+  } catch {
+    categories = [];
+  }
+
   return (
     <html
       lang={locale}
       dir={isRtl ? "rtl" : "ltr"}
       className={`${fontAnton.variable} ${fontOswald.variable} ${fontCairo.variable} ${fontAlmarai.variable}`}
     >
-      <body className="bg-[#1c1a17] text-[#f2ede4] font-body min-h-screen antialiased selection:bg-[#e0562c] selection:text-white flex flex-col justify-between">
+      <body className="bg-canvas text-ink font-body min-h-screen antialiased selection:bg-brand selection:text-white flex flex-col justify-between">
         <ErrorBoundary>
           <AuthProvider>
             <NextIntlClientProvider messages={messages}>
               <CartProvider>
-                <Header />
+                <Header categories={categories} />
                 <main className="flex-grow">{children}</main>
                 <Footer />
               </CartProvider>

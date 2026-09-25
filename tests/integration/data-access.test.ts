@@ -54,6 +54,7 @@ function product(overrides: Partial<Product> = {}): Omit<Product, "created_at"> 
     price: 250,
     quantity: 5,
     images: ["/images/placeholders/egyrock-1.jpeg"],
+    sizes: [],
     ...overrides,
   };
 }
@@ -107,6 +108,7 @@ describe("products DAL", () => {
       quantity: 5,
       images: ["/images/placeholders/egyrock-1.jpeg"],
       created_at: "2026-01-01T00:00:00.000Z",
+      sizes: [],
     });
   });
 
@@ -227,6 +229,7 @@ describe("categories DAL", () => {
     name_en: "T-shirts",
     name_ar: "تيشيرتات",
     name_fr: "T-shirts",
+    parent_id: "",
   };
 
   it("parses category rows", async () => {

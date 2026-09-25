@@ -38,9 +38,10 @@ export function PosterBadge({
   }
 
   const colorStyles = {
-    in_stock: "border-[#2ea043] text-[#2ea043] bg-[#2ea043]/10 shadow-[2px_2px_0px_#2ea043]",
-    countdown: "border-[#d97706] text-[#d97706] bg-[#d97706]/10 shadow-[2px_2px_0px_#d97706]",
-    out_of_stock: "border-[#dc2626] text-[#dc2626] bg-[#dc2626]/10 shadow-[2px_2px_0px_#dc2626]",
+    in_stock: "border-success text-success bg-success/10 shadow-[2px_2px_0px_var(--color-success)]",
+    countdown:
+      "border-warning text-warning bg-warning/10 shadow-[2px_2px_0px_var(--color-warning)]",
+    out_of_stock: "border-danger text-danger bg-danger/10 shadow-[2px_2px_0px_var(--color-danger)]",
   }[status];
 
   const sizeStyles = {

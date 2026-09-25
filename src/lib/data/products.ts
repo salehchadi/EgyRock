@@ -15,6 +15,20 @@ function rowToProduct(row: string[]): Product {
     images = [row[10] || ""];
   }
 
+  let sizes: string[] = [];
+  try {
+    if (row[12]) {
+      sizes = row[12].startsWith("[")
+        ? JSON.parse(row[12])
+        : row[12]
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+    }
+  } catch {
+    sizes = [];
+  }
+
   return {
     id: row[0] || "",
     category_id: row[1] || "",
@@ -28,6 +42,7 @@ function rowToProduct(row: string[]): Product {
     quantity: Math.max(0, parseInt(row[9], 10) || 0),
     images: images.filter(Boolean),
     created_at: row[11] || new Date().toISOString(),
+    sizes,
   };
 }
 
@@ -45,6 +60,7 @@ function productToRow(p: Product): any[] {
     p.quantity,
     JSON.stringify(p.images),
     p.created_at,
+    JSON.stringify(p.sizes || []),
   ];
 }
 

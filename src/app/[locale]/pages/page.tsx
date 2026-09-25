@@ -17,24 +17,24 @@ export default async function StorefrontPageIndex({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-      <h1 className="text-4xl font-heading uppercase text-[#f2ede4] tracking-wide">Information</h1>
-      <div className="h-1 w-16 bg-[#e0562c] mt-3 mb-10" />
+      <h1 className="text-4xl font-heading uppercase text-ink tracking-wide">Information</h1>
+      <div className="h-1 w-16 bg-brand mt-3 mb-10" />
 
       <ul className="space-y-4">
         {pages.map((p) => (
           <li key={p.id}>
             <Link href={`/pages/${p.slug}`} className="underground-card block p-5 group">
-              <span className="font-heading text-xl uppercase text-[#f2ede4] group-hover:text-[#e0562c] transition">
+              <span className="font-heading text-xl uppercase text-ink group-hover:text-brand transition">
                 {p[`title_${lang}`] || p.title_en}
               </span>
-              <span className="block text-xs text-[#9e978e] mt-1 font-mono">/pages/{p.slug}</span>
+              <span className="block text-xs text-muted mt-1 font-mono">/pages/{p.slug}</span>
             </Link>
           </li>
         ))}
       </ul>
 
       {pages.length === 0 && (
-        <p className="text-[#9e978e] uppercase font-heading">No pages published yet.</p>
+        <p className="text-muted uppercase font-heading">No pages published yet.</p>
       )}
     </div>
   );

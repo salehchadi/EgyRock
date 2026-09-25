@@ -52,21 +52,21 @@ function LoginForm() {
   }
 
   return (
-    <div className="max-w-md w-full space-y-8 bg-[#282521] border-2 border-[#3f3b35] p-8 shadow-[6px_6px_0px_#e0562c]">
+    <div className="max-w-md w-full space-y-8 bg-surface border-2 border-line p-8 shadow-[6px_6px_0px_var(--color-brand)]">
       <div>
         <div className="inline-block mb-3">
-          <span className="text-xs uppercase font-bold tracking-widest text-[#e0562c] bg-black/50 px-2.5 py-1 border border-[#e0562c]">
+          <span className="text-xs uppercase font-bold tracking-widest text-brand bg-black/50 px-2.5 py-1 border border-brand">
             {isArabic ? "بوابة الدخول" : "ACCESS GATE"}
           </span>
         </div>
         <h1
-          className={`text-3xl sm:text-4xl font-extrabold uppercase text-[#f2ede4] tracking-tight ${
+          className={`text-3xl sm:text-4xl font-extrabold uppercase text-ink tracking-tight ${
             isArabic ? "font-arabic-heading" : "font-heading"
           }`}
         >
           {isArabic ? "تسجيل الدخول" : locale === "fr" ? "Connexion" : "SIGN IN"}
         </h1>
-        <p className="mt-2 text-xs sm:text-sm text-[#9e978e]">
+        <p className="mt-2 text-xs sm:text-sm text-muted">
           {isArabic
             ? "سجل دخولك لمتابعة طلباتك وإيصالات إنستاباي"
             : "Log into your customer or admin account"}
@@ -74,7 +74,7 @@ function LoginForm() {
       </div>
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border-2 border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold tracking-wider">
+        <div className="p-3 bg-danger/15 border-2 border-danger text-danger text-xs uppercase font-bold tracking-wider">
           {error}
         </div>
       )}
@@ -84,7 +84,7 @@ function LoginForm() {
           <div>
             <label
               htmlFor="email"
-              className="block text-xs uppercase tracking-wider font-bold text-[#f2ede4] mb-1.5"
+              className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
             >
               {isArabic ? "البريد الإلكتروني" : "Email Address"}
             </label>
@@ -96,14 +96,14 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@domain.com"
-              className="w-full bg-[#1c1a17] border-2 border-[#3f3b35] focus:border-[#e0562c] text-[#f2ede4] px-4 py-3 text-sm outline-none transition"
+              className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="block text-xs uppercase tracking-wider font-bold text-[#f2ede4] mb-1.5"
+              className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
             >
               {isArabic ? "كلمة المرور" : "Password"}
             </label>
@@ -115,7 +115,7 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-[#1c1a17] border-2 border-[#3f3b35] focus:border-[#e0562c] text-[#f2ede4] px-4 py-3 text-sm outline-none transition"
+              className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 bg-[#e0562c] hover:bg-[#c44721] text-white font-heading uppercase text-base tracking-wider transition border-2 border-black shadow-[4px_4px_0px_black] active:translate-y-0.5 active:shadow-[2px_2px_0px_black] cursor-pointer disabled:opacity-60"
+            className="w-full py-3.5 px-4 bg-brand hover:bg-brand-strong text-white font-heading uppercase text-base tracking-wider transition border-2 border-black shadow-[4px_4px_0px_black] active:translate-y-0.5 active:shadow-[2px_2px_0px_black] cursor-pointer disabled:opacity-60"
           >
             {loading
               ? isArabic
@@ -137,25 +137,25 @@ function LoginForm() {
         </div>
       </form>
 
-      <div className="pt-4 border-t border-[#3f3b35] flex items-center justify-between text-xs text-[#9e978e]">
+      <div className="pt-4 border-t border-line flex items-center justify-between text-xs text-muted">
         <span>{isArabic ? "ليس لديك حساب؟" : "Don't have an account?"}</span>
         <Link
           href="/auth/register"
-          className="text-[#e0562c] hover:underline font-bold uppercase tracking-wider"
+          className="text-brand hover:underline font-bold uppercase tracking-wider"
         >
           {isArabic ? "إنشاء حساب جديد" : "REGISTER NOW"}
         </Link>
       </div>
 
-      <div className="p-3 bg-[#1c1a17] border border-[#3f3b35] text-[11px] text-[#9e978e] space-y-1">
-        <p className="font-bold text-[#f2ede4] uppercase">Demo Credentials:</p>
+      <div className="p-3 bg-canvas border border-line text-[11px] text-muted space-y-1">
+        <p className="font-bold text-ink uppercase">Demo Credentials:</p>
         <p>
-          Admin: <code className="text-[#e0562c]">admin@egyrock.com</code> /{" "}
-          <code className="text-[#f2ede4]">admin123</code>
+          Admin: <code className="text-brand">admin@egyrock.com</code> /{" "}
+          <code className="text-ink">admin123</code>
         </p>
         <p>
-          Customer: <code className="text-[#e0562c]">customer@egyrock.local</code> /{" "}
-          <code className="text-[#f2ede4]">customer123</code>
+          Customer: <code className="text-brand">customer@egyrock.local</code> /{" "}
+          <code className="text-ink">customer123</code>
         </p>
       </div>
     </div>
@@ -167,7 +167,7 @@ export default function LoginPage() {
     <div className="min-h-[75vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-screen-print">
       <Suspense
         fallback={
-          <div className="max-w-md w-full p-8 text-center bg-[#282521] border border-[#3f3b35] text-[#9e978e] font-heading uppercase">
+          <div className="max-w-md w-full p-8 text-center bg-surface border border-line text-muted font-heading uppercase">
             Loading...
           </div>
         }

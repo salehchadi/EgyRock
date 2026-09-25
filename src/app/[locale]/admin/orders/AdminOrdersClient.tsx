@@ -68,14 +68,14 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
       <div>
         <a
           href={`/${locale}/admin`}
-          className="text-xs text-[#9e978e] hover:text-[#e0562c] uppercase tracking-widest"
+          className="text-xs text-muted hover:text-brand uppercase tracking-widest"
         >
           ← Dashboard
         </a>
-        <h1 className="text-3xl font-heading uppercase text-[#f2ede4] mt-1">
+        <h1 className="text-3xl font-heading uppercase text-ink mt-1">
           Orders
           {pendingCount > 0 && (
-            <span className="ml-3 align-middle text-xs bg-[#d97706] text-black px-2 py-1 font-bold uppercase tracking-wider">
+            <span className="ml-3 align-middle text-xs bg-warning text-black px-2 py-1 font-bold uppercase tracking-wider">
               {pendingCount} Pending
             </span>
           )}
@@ -83,7 +83,7 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
       </div>
 
       {error && (
-        <div className="p-3 bg-[#dc2626]/15 border border-[#dc2626] text-[#dc2626] text-xs uppercase font-bold">
+        <div className="p-3 bg-danger/15 border border-danger text-danger text-xs uppercase font-bold">
           {error}
         </div>
       )}
@@ -96,8 +96,8 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
             onClick={() => setFilter(f)}
             className={`px-4 py-2 text-xs uppercase font-heading tracking-wider border-2 transition ${
               filter === f
-                ? "border-[#e0562c] bg-[#e0562c] text-white"
-                : "border-[#3f3b35] text-[#9e978e] hover:border-[#f2ede4] hover:text-[#f2ede4]"
+                ? "border-brand bg-brand text-white"
+                : "border-line text-muted hover:border-ink hover:text-ink"
             }`}
           >
             {f}
@@ -108,36 +108,34 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
       {/* Orders List */}
       <div className="space-y-4">
         {filtered.map((order) => (
-          <div key={order.id} className="underground-card border-2 !border-[#3f3b35] p-5 space-y-4">
+          <div key={order.id} className="underground-card border-2 !border-line p-5 space-y-4">
             {/* Row 1: meta */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="font-mono text-sm text-[#e0562c] font-bold">{order.id}</span>
+                <span className="font-mono text-sm text-brand font-bold">{order.id}</span>
                 <StatusBadge status={order.status} />
-                <span className="text-xs text-[#9e978e]">
+                <span className="text-xs text-muted">
                   {new Date(order.created_at).toLocaleString()}
                 </span>
               </div>
-              <span className="font-heading text-xl text-[#f2ede4]">
-                {order.total.toFixed(2)} EGP
-              </span>
+              <span className="font-heading text-xl text-ink">{order.total.toFixed(2)} EGP</span>
             </div>
 
             {/* Row 2: customer */}
             <div className="grid sm:grid-cols-3 gap-3 text-sm">
               <div>
                 <span className="label-field">Customer</span>
-                <span className="text-[#f2ede4]">{order.customer_name}</span>
+                <span className="text-ink">{order.customer_name}</span>
               </div>
               <div>
                 <span className="label-field">Phone</span>
-                <span className="text-[#f2ede4]" dir="ltr">
+                <span className="text-ink" dir="ltr">
                   {order.customer_phone}
                 </span>
               </div>
               <div>
                 <span className="label-field">Address</span>
-                <span className="text-[#f2ede4]">{order.shipping_address}</span>
+                <span className="text-ink">{order.shipping_address}</span>
               </div>
             </div>
 
@@ -145,14 +143,14 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
             <div>
               <button
                 onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}
-                className="text-xs uppercase font-heading tracking-wider text-[#9e978e] hover:text-[#e0562c] transition"
+                className="text-xs uppercase font-heading tracking-wider text-muted hover:text-brand transition"
               >
                 {expandedId === order.id ? "▼ Hide items" : "▶ Show items"} ({order.items.length})
               </button>
               {expandedId === order.id && (
-                <table className="w-full text-sm mt-3 border border-[#3f3b35]">
+                <table className="w-full text-sm mt-3 border border-line">
                   <thead>
-                    <tr className="text-xs uppercase text-[#9e978e] border-b border-[#3f3b35]">
+                    <tr className="text-xs uppercase text-muted border-b border-line">
                       <th className="text-left px-3 py-2">Product</th>
                       <th className="text-right px-3 py-2">Qty</th>
                       <th className="text-right px-3 py-2">Unit</th>
@@ -161,13 +159,13 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
                   </thead>
                   <tbody>
                     {order.items.map((item, idx) => (
-                      <tr key={idx} className="border-b border-[#3f3b35]/50">
-                        <td className="px-3 py-2 text-[#f2ede4]">{item.name}</td>
-                        <td className="px-3 py-2 text-right text-[#f2ede4]">{item.quantity}</td>
-                        <td className="px-3 py-2 text-right text-[#9e978e]">
+                      <tr key={idx} className="border-b border-line/50">
+                        <td className="px-3 py-2 text-ink">{item.name}</td>
+                        <td className="px-3 py-2 text-right text-ink">{item.quantity}</td>
+                        <td className="px-3 py-2 text-right text-muted">
                           {item.unit_price.toFixed(2)}
                         </td>
-                        <td className="px-3 py-2 text-right text-[#f2ede4]">
+                        <td className="px-3 py-2 text-right text-ink">
                           {(item.unit_price * item.quantity).toFixed(2)}
                         </td>
                       </tr>
@@ -178,10 +176,10 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
             </div>
 
             {/* Row 4: receipt + actions */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#3f3b35]">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-line">
               <button
                 onClick={() => setReceiptView(order)}
-                className="text-xs px-4 py-2 border border-[#3f3b35] hover:border-[#e0562c] text-[#f2ede4] uppercase font-heading tracking-wider transition"
+                className="text-xs px-4 py-2 border border-line hover:border-brand text-ink uppercase font-heading tracking-wider transition"
               >
                 🧾 View Receipt
               </button>
@@ -191,7 +189,7 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
                   <button
                     onClick={() => setStatus(order, "Confirmed")}
                     disabled={busyId === order.id}
-                    className="px-5 py-2 bg-[#2ea043] hover:bg-[#279039] text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition disabled:opacity-50"
+                    className="px-5 py-2 bg-success hover:bg-success-strong text-white font-heading uppercase text-sm tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition disabled:opacity-50"
                   >
                     {busyId === order.id ? "..." : "✓ Confirm"}
                   </button>
@@ -204,7 +202,7 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
                   </button>
                 </div>
               ) : (
-                <span className="text-xs text-[#9e978e] uppercase tracking-wider">
+                <span className="text-xs text-muted uppercase tracking-wider">
                   {order.confirmed_at
                     ? `Processed ${new Date(order.confirmed_at).toLocaleString()}`
                     : "No further action"}
@@ -215,7 +213,7 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
         ))}
 
         {filtered.length === 0 && (
-          <p className="text-center py-12 text-[#9e978e] uppercase font-heading">
+          <p className="text-center py-12 text-muted uppercase font-heading">
             No orders in this status.
           </p>
         )}
@@ -228,16 +226,16 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
           onClick={() => setReceiptView(null)}
         >
           <div
-            className="bg-[#282521] border-2 border-[#e0562c] max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_#e0562c]"
+            className="bg-surface border-2 border-brand max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-[8px_8px_0_var(--color-brand)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-heading uppercase text-[#f2ede4]">
+              <h2 className="text-xl font-heading uppercase text-ink">
                 Receipt — {receiptView.id}
               </h2>
               <button
                 onClick={() => setReceiptView(null)}
-                className="text-[#9e978e] hover:text-[#f2ede4] text-xl leading-none"
+                className="text-muted hover:text-ink text-xl leading-none"
               >
                 ×
               </button>
@@ -247,15 +245,15 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
               <img
                 src={receiptView.receipt_image_url}
                 alt={`Payment receipt for ${receiptView.id}`}
-                className="w-full h-auto border border-[#3f3b35]"
+                className="w-full h-auto border border-line"
               />
             ) : (
-              <p className="text-[#9e978e] text-sm py-8 text-center uppercase">
+              <p className="text-muted text-sm py-8 text-center uppercase">
                 No receipt image attached to this order.
               </p>
             )}
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm text-[#f2ede4]">
+              <span className="text-sm text-ink">
                 Total: <strong>{receiptView.total.toFixed(2)} EGP</strong>
               </span>
               {receiptView.status === "Pending payment" && (
@@ -265,7 +263,7 @@ export default function AdminOrdersClient({ orders: initialOrders, locale }: Pro
                       setReceiptView(null);
                       setStatus(receiptView, "Confirmed");
                     }}
-                    className="px-4 py-2 bg-[#2ea043] hover:bg-[#279039] text-white font-heading uppercase text-xs tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
+                    className="px-4 py-2 bg-success hover:bg-success-strong text-white font-heading uppercase text-xs tracking-wider border-2 border-black shadow-[3px_3px_0px_black] transition"
                   >
                     ✓ Confirm
                   </button>

@@ -20,6 +20,7 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     quantity: 3,
     images: ["/images/placeholders/egyrock-1.jpeg"],
     created_at: "2026-01-01T00:00:00.000Z",
+    sizes: [],
     ...overrides,
   };
 }

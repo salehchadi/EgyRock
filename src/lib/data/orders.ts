@@ -24,6 +24,8 @@ function rowToOrder(row: string[]): Order {
     receipt_image_url: row[8] || "",
     created_at: row[9] || new Date().toISOString(),
     confirmed_at: row[10] || undefined,
+    coupon_code: row[11] || "",
+    discount: Number(row[12]) || 0,
   };
 }
 
@@ -40,6 +42,8 @@ function orderToRow(o: Order): any[] {
     o.receipt_image_url,
     o.created_at,
     o.confirmed_at || "",
+    o.coupon_code || "",
+    o.discount || 0,
   ];
 }
 
@@ -63,9 +67,15 @@ export async function getOrdersByUserId(userId: string): Promise<Order[]> {
   return orders.filter((o) => o.user_id === userId);
 }
 
-export async function createOrder(
-  data: Omit<Order, "id" | "status" | "created_at" | "confirmed_at">,
-): Promise<Order> {
+export type CreateOrderInput = Omit<
+  Order,
+  "id" | "status" | "created_at" | "confirmed_at" | "coupon_code" | "discount"
+> & {
+  coupon_code?: string;
+  discount?: number;
+};
+
+export async function createOrder(data: CreateOrderInput): Promise<Order> {
   if (!data.customer_name || !data.customer_phone || !data.shipping_address) {
     throw new Error("Missing required customer shipping information");
   }
@@ -81,6 +91,8 @@ export async function createOrder(
     id: orderId,
     status: "Pending payment",
     created_at: new Date().toISOString(),
+    coupon_code: data.coupon_code || "",
+    discount: Math.max(0, Number(data.discount) || 0),
   };
 
   await appendRow(TAB, orderToRow(newOrder));

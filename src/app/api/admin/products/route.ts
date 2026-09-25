@@ -31,6 +31,7 @@ export async function POST(req: Request) {
       quantity,
       category_id,
       images,
+      sizes,
     } = body;
 
     if (!name_en || !category_id) {
@@ -49,6 +50,14 @@ export async function POST(req: Request) {
       quantity: Number(quantity) || 0,
       category_id,
       images: images || [],
+      sizes: Array.isArray(sizes)
+        ? sizes.map((s: any) => String(s).trim()).filter(Boolean)
+        : typeof sizes === "string"
+          ? sizes
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : [],
     });
 
     return NextResponse.json({ product }, { status: 201 });

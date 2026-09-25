@@ -1,28 +1,69 @@
 @import "tailwindcss";
 
+/* =====================================================================
+   EGYROCK PALETTE — SINGLE SOURCE OF TRUTH
+   ---------------------------------------------------------------------
+   Every colour in the UI comes from the tokens below (Tailwind v4 turns
+   each `--color-*` token into utilities such as `bg-brand`, `text-ink`,
+   `border-line`). To re-skin the whole site, change ONLY this block —
+   no component file hard-codes a hex value any more.
+
+   Token → utilities cheatsheet
+     canvas      bg-canvas            page background (darkest base)
+     surface     bg-surface           cards, header, drawer panels
+     surface-2   bg-surface-2         hover / elevated surface
+     sunken      bg-sunken            inset wells, image frames
+     ink         text-ink             primary text
+     ink-dim     text-ink-dim         secondary text
+     muted       text-muted           labels, metadata
+     line        border-line          borders & dividers
+     brand       bg-brand text-brand  primary accent (buttons, links)
+     brand-strong bg-brand-strong     accent hover / active
+     success     text-success         in-stock, confirmed
+     warning     text-warning         low-stock, pending
+     danger      text-danger          out-of-stock, rejected
+
+   Notes
+     • Pure black / white are NOT palette tokens: they are the fixed
+       screen-print contrast anchors used for hard offset shadows and
+       borders (`shadow-[3px_3px_0px_black]`, `bg-black/70` scrims,
+       `text-white` on an accent button). They stay legible under any
+       palette, so a re-skin never has to touch them.
+     • Anything else you see that looks like a colour should be a token.
+   ===================================================================== */
 @theme {
-  --color-charcoal-base: #1c1a17;
-  --color-charcoal-card: #282521;
-  --color-charcoal-elevated: #332f2a;
-  --color-charcoal-dark: #141210;
+  /* Core surfaces */
+  --color-canvas: #1c1a17;
+  --color-surface: #282521;
+  --color-surface-2: #332f2a;
+  --color-sunken: #141210;
 
-  --color-bone-text: #f2ede4;
-  --color-bone-dim: #c5beaf;
-  --color-ash-muted: #9e978e;
-  --color-border-gritty: #3f3b35;
+  /* Text */
+  --color-ink: #f2ede4;
+  --color-ink-dim: #c5beaf;
+  --color-muted: #9e978e;
 
-  --color-coral-accent: #e0562c;
-  --color-coral-hover: #c44721;
-  --color-coral-glow: rgba(224, 86, 44, 0.25);
+  /* Lines */
+  --color-line: #3f3b35;
 
-  --color-stock-in: #2ea043;
-  --color-stock-in-bg: rgba(46, 160, 67, 0.12);
+  /* Brand accent */
+  --color-brand: #e0562c;
+  --color-brand-strong: #c44721;
 
-  --color-stock-countdown: #d97706;
-  --color-stock-countdown-bg: rgba(217, 119, 6, 0.14);
+  /* Status */
+  --color-success: #2ea043;
+  --color-success-strong: #279039;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
 
-  --color-stock-out: #dc2626;
-  --color-stock-out-bg: rgba(220, 38, 38, 0.15);
+  /* Translucent helpers (used by the plain-CSS classes below) */
+  --color-brand-soft: rgba(224, 86, 44, 0.25);
+  --color-brand-ghost: rgba(224, 86, 44, 0.05);
+  --color-brand-ring: rgba(224, 86, 44, 0.3);
+  --color-success-soft: rgba(46, 160, 67, 0.12);
+  --color-warning-soft: rgba(217, 119, 6, 0.14);
+  --color-danger-soft: rgba(220, 38, 38, 0.15);
+  --color-ink-faint: rgba(242, 237, 228, 0.03);
 
   --font-anton: var(--font-anton), Anton, impact, sans-serif;
   --font-oswald: var(--font-oswald), Oswald, sans-serif;
@@ -31,9 +72,9 @@
 }
 
 :root {
-  --background: #1c1a17;
-  --foreground: #f2ede4;
-  --accent: #e0562c;
+  --background: var(--color-canvas);
+  --foreground: var(--color-ink);
+  --accent: var(--color-brand);
 }
 
 html {
@@ -101,29 +142,83 @@ video {
   font-family: var(--font-almarai), sans-serif;
 }
 
+/* ===== Menu drawer slide-in animation =====
+   Panel enters from the LEFT in LTR locales (en/fr) and from the
+   RIGHT in RTL (ar) — the direction class is applied by MenuDrawer. */
+@keyframes drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: drawer-in-left 0.25s ease-out both;
+}
+
+.slide-in-right {
+  animation: drawer-in-right 0.25s ease-out both;
+}
+
+/* ===== Horizontal product scroller (mobile-first home) ===== */
+.horizontal-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding-bottom: 0.5rem;
+}
+
+.horizontal-scroll > * {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+/* Hide the scrollbar affordance slightly but keep it usable */
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+
 /* Cairo Underground Diagonal Screen-Print Texture (Pure CSS) */
 .bg-screen-print {
-  background-color: #1c1a17;
+  background-color: var(--color-canvas);
   background-image:
     repeating-linear-gradient(
       -45deg,
-      rgba(224, 86, 44, 0.035) 0px,
-      rgba(224, 86, 44, 0.035) 1px,
+      var(--color-brand-ghost) 0px,
+      var(--color-brand-ghost) 1px,
       transparent 1px,
       transparent 8px
     ),
-    radial-gradient(rgba(242, 237, 228, 0.03) 1px, transparent 1px);
+    radial-gradient(var(--color-ink-faint) 1px, transparent 1px);
   background-size:
     auto,
     12px 12px;
 }
 
 .bg-screen-print-dense {
-  background-color: #1c1a17;
+  background-color: var(--color-canvas);
   background-image: repeating-linear-gradient(
     -45deg,
-    rgba(224, 86, 44, 0.07) 0px,
-    rgba(224, 86, 44, 0.07) 1.5px,
+    var(--color-brand-soft) 0px,
+    var(--color-brand-soft) 1.5px,
     transparent 1.5px,
     transparent 6px
   );
@@ -137,8 +232,8 @@ video {
 
 /* Rough edge / underground grit card */
 .underground-card {
-  background-color: #282521;
-  border: 1px solid #3f3b35;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-line);
   transition:
     transform 0.15s ease,
     border-color 0.15s ease,
@@ -146,19 +241,19 @@ video {
 }
 
 .underground-card:hover {
-  border-color: #e0562c;
-  box-shadow: 4px 4px 0px #e0562c;
+  border-color: var(--color-brand);
+  box-shadow: 4px 4px 0px var(--color-brand);
   transform: translate(-2px, -2px);
 }
 
-/* ========== Admin Panel Utility Classes ========== */
+/* ===== Admin Panel Utility Classes (all colours come from the palette) ===== */
 
 .admin-input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  background-color: #1c1a17;
-  border: 1px solid #3f3b35;
-  color: #f2ede4;
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
   font-family: var(--font-oswald), sans-serif;
   font-size: 0.875rem;
   transition: border-color 0.15s ease;
@@ -166,18 +261,18 @@ video {
 
 .admin-input:focus {
   outline: none;
-  border-color: #e0562c;
-  box-shadow: 0 0 0 1px rgba(224, 86, 44, 0.3);
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 1px var(--color-brand-ring);
 }
 
 .admin-input::placeholder {
-  color: #9e978e;
+  color: var(--color-muted);
   opacity: 0.7;
 }
 
 .admin-input option {
-  background-color: #1c1a17;
-  color: #f2ede4;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
 }
 
 .label-field {
@@ -185,14 +280,14 @@ video {
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9e978e;
+  color: var(--color-muted);
   margin-bottom: 0.25rem;
   font-weight: 600;
 }
 
 .admin-btn-primary {
   padding: 0.5rem 1.25rem;
-  background-color: #e0562c;
+  background-color: var(--color-brand);
   color: white;
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
@@ -208,7 +303,7 @@ video {
 }
 
 .admin-btn-primary:hover:not(:disabled) {
-  background-color: #c44721;
+  background-color: var(--color-brand-strong);
 }
 
 .admin-btn-primary:active:not(:disabled) {
@@ -224,12 +319,12 @@ video {
 .admin-btn-secondary {
   padding: 0.5rem 1.25rem;
   background-color: transparent;
-  color: #9e978e;
+  color: var(--color-muted);
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
   font-size: 0.8125rem;
   letter-spacing: 0.05em;
-  border: 1px solid #3f3b35;
+  border: 1px solid var(--color-line);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -237,25 +332,25 @@ video {
 }
 
 .admin-btn-secondary:hover {
-  border-color: #f2ede4;
-  color: #f2ede4;
+  border-color: var(--color-ink);
+  color: var(--color-ink);
 }
 
 .admin-btn-danger {
   padding: 0.5rem 1.25rem;
   background-color: transparent;
-  color: #dc2626;
+  color: var(--color-danger);
   font-family: var(--font-anton), sans-serif;
   text-transform: uppercase;
   font-size: 0.8125rem;
   letter-spacing: 0.05em;
-  border: 1px solid #dc2626;
+  border: 1px solid var(--color-danger);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .admin-btn-danger:hover {
-  background-color: rgba(220, 38, 38, 0.1);
+  background-color: var(--color-danger-soft);
 }
 
 /* Admin status badges */
@@ -266,9 +361,9 @@ video {
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border: 2px solid #d97706;
-  color: #d97706;
-  background: rgba(217, 119, 6, 0.1);
+  border: 2px solid var(--color-warning);
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
 }
 
 .admin-status-confirmed {
@@ -278,9 +373,9 @@ video {
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border: 2px solid #2ea043;
-  color: #2ea043;
-  background: rgba(46, 160, 67, 0.1);
+  border: 2px solid var(--color-success);
+  color: var(--color-success);
+  background: var(--color-success-soft);
 }
 
 .admin-status-rejected {
@@ -290,7 +385,7 @@ video {
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border: 2px solid #dc2626;
-  color: #dc2626;
-  background: rgba(220, 38, 38, 0.1);
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }

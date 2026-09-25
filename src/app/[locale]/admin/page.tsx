@@ -72,16 +72,16 @@ export default async function AdminDashboardPage({
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
       {/* Admin Banner */}
-      <div className="bg-[#282521] border-2 border-[#e0562c] p-6 sm:p-8 relative shadow-[6px_6px_0px_#e0562c]">
+      <div className="bg-surface border-2 border-brand p-6 sm:p-8 relative shadow-[6px_6px_0px_var(--color-brand)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-block mb-2">
-              <span className="text-xs uppercase font-bold tracking-widest text-black bg-[#e0562c] px-2.5 py-0.5 font-heading">
+              <span className="text-xs uppercase font-bold tracking-widest text-black bg-brand px-2.5 py-0.5 font-heading">
                 CONFIDENTIAL / RESTRICTED ACCESS
               </span>
             </div>
             <h1
-              className={`text-3xl sm:text-5xl font-extrabold uppercase text-[#f2ede4] ${
+              className={`text-3xl sm:text-5xl font-extrabold uppercase text-ink ${
                 isArabic ? "font-arabic-heading" : "font-heading"
               }`}
             >
@@ -92,7 +92,7 @@ export default async function AdminDashboardPage({
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="px-4 py-2 border border-[#3f3b35] hover:border-[#f2ede4] text-xs font-heading uppercase tracking-wider text-[#f2ede4] transition"
+              className="px-4 py-2 border border-line hover:border-ink text-xs font-heading uppercase tracking-wider text-ink transition"
             >
               View Storefront
             </Link>
@@ -106,32 +106,30 @@ export default async function AdminDashboardPage({
           <Link key={sec.title} href={sec.path}>
             <div
               className={`underground-card p-6 flex flex-col justify-between border-2 transition h-full ${
-                (sec as any).highlight
-                  ? "border-[#d97706]"
-                  : "border-[#3f3b35] hover:border-[#e0562c]"
+                (sec as any).highlight ? "border-warning" : "border-line hover:border-brand"
               }`}
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span
                     className={`text-[11px] font-mono uppercase font-bold ${
-                      (sec as any).highlight ? "text-[#d97706]" : "text-[#e0562c]"
+                      (sec as any).highlight ? "text-warning" : "text-brand"
                     }`}
                   >
                     {sec.count}
                   </span>
-                  <span className="text-[10px] uppercase tracking-widest text-[#9e978e] bg-black/40 px-2 py-0.5">
+                  <span className="text-[10px] uppercase tracking-widest text-muted bg-black/40 px-2 py-0.5">
                     Live DAL
                   </span>
                 </div>
-                <h2 className="font-heading text-2xl uppercase text-[#f2ede4] tracking-wide">
+                <h2 className="font-heading text-2xl uppercase text-ink tracking-wide">
                   {sec.title}
                 </h2>
-                <p className="text-xs text-[#9e978e] leading-relaxed">{sec.desc}</p>
+                <p className="text-xs text-muted leading-relaxed">{sec.desc}</p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-[#3f3b35] flex items-center justify-between">
-                <span className="text-xs uppercase font-heading text-[#e0562c] tracking-wider">
+              <div className="pt-4 mt-4 border-t border-line flex items-center justify-between">
+                <span className="text-xs uppercase font-heading text-brand tracking-wider">
                   Manage →
                 </span>
               </div>

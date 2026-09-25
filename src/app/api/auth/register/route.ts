@@ -5,11 +5,30 @@ import { createUser, getUserByEmail } from "@/lib/data/users";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password } = body;
+    const { name, email, password, phone, address, gender, age } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "Name, email, and password are required" },
+        { status: 400 },
+      );
+    }
+
+    if (!phone || !address || !gender || !age) {
+      return NextResponse.json(
+        { error: "Phone, location address, gender, and age are required" },
+        { status: 400 },
+      );
+    }
+
+    if (!["male", "female", "other"].includes(gender)) {
+      return NextResponse.json({ error: "Invalid gender value" }, { status: 400 });
+    }
+
+    const ageNum = parseInt(String(age), 10);
+    if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
+      return NextResponse.json(
+        { error: "Age must be a number between 13 and 120" },
         { status: 400 },
       );
     }
@@ -36,6 +55,10 @@ export async function POST(request: Request) {
       email: email.toLowerCase().trim(),
       password_hash: passwordHash,
       role: "customer",
+      phone: String(phone).trim(),
+      address: String(address).trim(),
+      gender,
+      age: String(ageNum),
     });
 
     return NextResponse.json({
@@ -45,6 +68,10 @@ export async function POST(request: Request) {
         email: user.email,
         name: user.name,
         role: user.role,
+        phone: user.phone,
+        address: user.address,
+        gender: user.gender,
+        age: user.age,
       },
     });
   } catch (error: any) {

@@ -38,15 +38,15 @@ export default async function StorefrontCustomPage({ params }: { params: PagePar
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
       <h1
-        className={`text-4xl uppercase text-[#f2ede4] tracking-wide ${
+        className={`text-4xl uppercase text-ink tracking-wide ${
           lang === "ar" ? "font-arabic-heading" : "font-heading"
         }`}
       >
         {title}
       </h1>
-      <div className="h-1 w-16 bg-[#e0562c] mt-3 mb-10" />
+      <div className="h-1 w-16 bg-brand mt-3 mb-10" />
       <div
-        className={`text-[#c5beaf] leading-relaxed whitespace-pre-wrap ${
+        className={`text-ink-dim leading-relaxed whitespace-pre-wrap ${
           lang === "ar" ? "font-arabic-body" : ""
         }`}
         dir={lang === "ar" ? "rtl" : undefined}

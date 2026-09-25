@@ -16,15 +16,17 @@ const CART_KEY = "egyrock_cart";
 export interface CartItem {
   product: Product;
   quantity: number;
+  /** Selected size for wearables; empty/undefined for one-size products. */
+  size?: string;
 }
 
 interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addItem: (product: Product, qty: number) => boolean;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, qty: number) => void;
+  addItem: (product: Product, qty: number, size?: string) => boolean;
+  removeItem: (productId: string, size?: string) => void;
+  updateQuantity: (productId: string, qty: number, size?: string) => void;
   clearCart: () => void;
 }
 
@@ -44,6 +46,11 @@ function writeCart(items: CartItem[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(CART_KEY, JSON.stringify(items));
   window.dispatchEvent(new Event("cart-updated"));
+}
+
+/** A line is identified by product id + size (sizes create separate lines). */
+function sameLine(item: CartItem, productId: string, size?: string) {
+  return item.product.id === productId && (item.size || "") === (size || "");
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -79,23 +86,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
   /**
-   * Add item to cart. Returns false if stock limit would be exceeded.
+   * Add item to cart (one line per product+size). Returns false if the stock
+   * limit would be exceeded across ALL lines of the same product.
    * NOTE: This does NOT decrement stock in the database.
    */
-  const addItem = useCallback((product: Product, qty: number): boolean => {
+  const addItem = useCallback((product: Product, qty: number, size?: string): boolean => {
     const current = readCart();
-    const existingIdx = current.findIndex((i) => i.product.id === product.id);
-    const currentInCart = existingIdx > -1 ? current[existingIdx].quantity : 0;
-    const newTotal = currentInCart + qty;
 
-    if (newTotal > product.quantity) {
+    // Stock is tracked per product, so count every line for this product.
+    const alreadyInCart = current
+      .filter((i) => i.product.id === product.id)
+      .reduce((sum, i) => sum + i.quantity, 0);
+
+    if (alreadyInCart + qty > product.quantity) {
       return false; // Would exceed stock
     }
 
+    const existingIdx = current.findIndex((i) => sameLine(i, product.id, size));
+
     if (existingIdx > -1) {
-      current[existingIdx].quantity = newTotal;
+      current[existingIdx].quantity += qty;
     } else {
-      current.push({ product, quantity: qty });
+      current.push({ product, quantity: qty, size: size || "" });
     }
 
     writeCart(current);
@@ -103,23 +115,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return true;
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    const current = readCart().filter((i) => i.product.id !== productId);
+  const removeItem = useCallback((productId: string, size?: string) => {
+    const current = readCart().filter((i) => !sameLine(i, productId, size));
     writeCart(current);
     setItems(current);
   }, []);
 
-  const updateQuantity = useCallback((productId: string, qty: number) => {
+  const updateQuantity = useCallback((productId: string, qty: number, size?: string) => {
     const current = readCart();
-    const idx = current.findIndex((i) => i.product.id === productId);
+    const idx = current.findIndex((i) => sameLine(i, productId, size));
     if (idx === -1) return;
 
     if (qty <= 0) {
       current.splice(idx, 1);
     } else {
-      // Enforce max stock
-      const maxQty = current[idx].product.quantity;
+      // Enforce max stock across all lines of the same product
+      const otherLines = current
+        .filter((i, n) => n !== idx && i.product.id === productId)
+        .reduce((sum, i) => sum + i.quantity, 0);
+      const maxQty = Math.max(0, current[idx].product.quantity - otherLines);
       current[idx].quantity = Math.min(qty, maxQty);
+      if (current[idx].quantity === 0) current.splice(idx, 1);
     }
 
     writeCart(current);

@@ -11,11 +11,26 @@ function rowToUser(row: string[]): User {
     name: row[3] || "",
     role: (row[4] as UserRole) || "customer",
     created_at: row[5] || new Date().toISOString(),
+    phone: row[6] || "",
+    address: row[7] || "",
+    gender: (row[8] as User["gender"]) || "",
+    age: row[9] || "",
   };
 }
 
 function userToRow(u: User): any[] {
-  return [u.id, u.email.toLowerCase().trim(), u.password_hash, u.name, u.role, u.created_at];
+  return [
+    u.id,
+    u.email.toLowerCase().trim(),
+    u.password_hash,
+    u.name,
+    u.role,
+    u.created_at,
+    u.phone || "",
+    u.address || "",
+    u.gender || "",
+    u.age || "",
+  ];
 }
 
 export async function getUsers(): Promise<User[]> {
@@ -39,7 +54,18 @@ export async function getUserById(id: string): Promise<User | null> {
   return users.find((u) => u.id === id) || null;
 }
 
-export async function createUser(data: Omit<User, "id" | "created_at">): Promise<User> {
+/**
+ * Input accepted by `createUser`.
+ * Identity fields are required; profile fields (phone, address, gender, age) are
+ * collected by the registration form and default to empty strings when omitted.
+ */
+export type CreateUserInput = Omit<
+  User,
+  "id" | "created_at" | "phone" | "address" | "gender" | "age"
+> &
+  Partial<Pick<User, "phone" | "address" | "gender" | "age">>;
+
+export async function createUser(data: CreateUserInput): Promise<User> {
   if (!data.email || !data.password_hash) {
     throw new Error("Missing required user fields (email, password_hash)");
   }
@@ -52,6 +78,10 @@ export async function createUser(data: Omit<User, "id" | "created_at">): Promise
   const userId = `USR-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
   const newUser: User = {
+    phone: "",
+    address: "",
+    gender: "",
+    age: "",
     ...data,
     id: userId,
     email: data.email.toLowerCase().trim(),
