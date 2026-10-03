@@ -41,7 +41,7 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
 
   const linkClass = () =>
     `block w-full text-start px-4 py-3 text-sm uppercase tracking-wider border-b border-line transition ${
-      isArabic ? "font-arabic-heading font-semibold" : "font-heading"
+      isArabic ? "font-arabic-heading font-medium" : "font-heading"
     } text-ink hover:text-brand hover:bg-surface`;
 
   if (!open) return null;
@@ -91,6 +91,12 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
           </Link>
           <Link href="/catalog" onClick={onClose} className={linkClass()}>
             {t("catalog")}
+          </Link>
+          <Link href="/pages/how-to-pay" onClick={onClose} className={linkClass()}>
+            {t("howToPay")}
+          </Link>
+          <Link href="/pages/about" onClick={onClose} className={linkClass()}>
+            {t("about")}
           </Link>
 
           {/* Categories with expandable sub-categories */}

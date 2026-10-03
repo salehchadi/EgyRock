@@ -10,6 +10,8 @@ export async function Footer() {
   const locale = await getLocale();
   const lang = (["en", "ar", "fr"].includes(locale) ? locale : "en") as "en" | "ar" | "fr";
 
+  const navT = await getTranslations("nav");
+
   // Dynamic footer links from the admin-managed Pages sheet (DB-connected).
   let publishedPages: CustomPage[] = [];
   try {
@@ -32,10 +34,16 @@ export async function Footer() {
           </span>
         </div>
 
-        {/* Dynamic page links from DB */}
-        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs uppercase font-heading tracking-wider">
+        {/* Navigation links */}
+        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs uppercase tracking-wider font-medium">
           <Link href="/catalog" className="hover:text-ink transition">
-            Catalog
+            {navT("catalog")}
+          </Link>
+          <Link href="/pages/how-to-pay" className="hover:text-ink transition">
+            {navT("howToPay")}
+          </Link>
+          <Link href="/pages/about" className="hover:text-ink transition">
+            {navT("about")}
           </Link>
           {publishedPages.map((p) => (
             <Link key={p.id} href={`/pages/${p.slug}`} className="hover:text-brand transition">

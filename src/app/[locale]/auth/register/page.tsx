@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Link } from "@/i18n/routing";
 
 export default function RegisterPage() {
@@ -130,20 +131,17 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
+                className="block text-xs uppercase tracking-wider font-medium text-ink mb-1.5"
               >
                 {isArabic ? "كلمة المرور (٦ أحرف على الأقل)" : "Password (min 6 characters)"}
               </label>
-              <input
+              <PasswordInput
                 id="password"
-                name="password"
-                type="password"
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
               />
             </div>
 

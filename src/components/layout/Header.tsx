@@ -19,6 +19,7 @@ export function Header({ categories = [] }: HeaderProps) {
   const user = session?.user as any;
   const { totalItems } = useCart();
   const brandT = useTranslations("brand");
+  const navT = useTranslations("nav");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,8 +39,25 @@ export function Header({ categories = [] }: HeaderProps) {
       <header className="sticky top-0 z-50 bg-canvas/95 backdrop-blur-md border-b-2 border-line shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2 h-14 sm:h-20">
-            {/* Brand / Logo */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            {/* Left Area: Menu button (on the left) + Brand / Logo + Navigation Links */}
+            <div className="flex items-center gap-2 sm:gap-6 min-w-0">
+              {/* Menu trigger — on the LEFT side of the header bar */}
+              <button
+                onClick={() => setMenuOpen(true)}
+                className="p-2 border border-line bg-surface text-ink hover:border-brand hover:text-brand transition flex-shrink-0"
+                aria-label="Open menu"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+
+              {/* Brand / Logo */}
               <Link
                 href="/"
                 className="group flex items-center gap-2 min-w-0 text-ink hover:text-brand transition"
@@ -49,22 +67,44 @@ export function Header({ categories = [] }: HeaderProps) {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span
-                    className={`text-base sm:text-2xl tracking-wider font-extrabold uppercase leading-none ${
+                    className={`text-base sm:text-2xl tracking-wider font-bold uppercase leading-none ${
                       isArabic ? "font-arabic-heading sm:text-xl" : "font-heading"
                     }`}
                   >
                     {brandT("name")}
                   </span>
-                  <span className="hidden sm:block text-[10px] text-muted tracking-widest uppercase mt-0.5">
+                  <span className="hidden sm:block text-[10px] text-muted tracking-widest uppercase mt-0.5 font-normal">
                     Cairo Underground
                   </span>
                 </div>
               </Link>
+
+              {/* Desktop Header Links: Catalog - How to Pay - About */}
+              <nav className="hidden lg:flex items-center gap-5 ms-4 border-s border-line ps-6 text-xs tracking-wider uppercase font-medium">
+                <Link
+                  href="/catalog"
+                  className="text-ink hover:text-brand transition hover:underline"
+                >
+                  {navT("catalog")}
+                </Link>
+                <Link
+                  href="/pages/how-to-pay"
+                  className="text-ink hover:text-brand transition hover:underline"
+                >
+                  {navT("howToPay")}
+                </Link>
+                <Link
+                  href="/pages/about"
+                  className="text-ink hover:text-brand transition hover:underline"
+                >
+                  {navT("about")}
+                </Link>
+              </nav>
             </div>
 
-            {/* Right Action Area (Locale Switcher, Account, Cart, Menu) */}
+            {/* Right Action Area (Locale Switcher, Account, Cart) */}
             <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-              {/* Locale switcher — hidden on phones, available inside the drawer */}
+              {/* Locale switcher */}
               <div className="hidden sm:block">
                 <LocaleSwitcher />
               </div>
@@ -97,7 +137,7 @@ export function Header({ categories = [] }: HeaderProps) {
                 </Link>
               )}
 
-              {/* Cart Icon (shopping cart, not a bag) */}
+              {/* Cart Icon */}
               <Link
                 href="/cart"
                 className="relative p-2 sm:p-2.5 border border-line bg-surface hover:border-brand text-ink transition flex items-center group shadow-[2px_2px_0px_rgba(0,0,0,0.5)]"
@@ -123,22 +163,6 @@ export function Header({ categories = [] }: HeaderProps) {
                   </span>
                 )}
               </Link>
-
-              {/* Menu trigger — opens the drawer (left in LTR, right in RTL) */}
-              <button
-                onClick={() => setMenuOpen(true)}
-                className="p-2 border border-line bg-surface text-ink hover:border-brand hover:text-brand transition"
-                aria-label="Open menu"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
             </div>
           </div>
         </div>

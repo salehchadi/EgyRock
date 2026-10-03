@@ -4,6 +4,7 @@ import React, { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Link } from "@/i18n/routing";
 
 function LoginForm() {
@@ -103,19 +104,16 @@ function LoginForm() {
           <div>
             <label
               htmlFor="password"
-              className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
+              className="block text-xs uppercase tracking-wider font-medium text-ink mb-1.5"
             >
               {isArabic ? "كلمة المرور" : "Password"}
             </label>
-            <input
+            <PasswordInput
               id="password"
-              name="password"
-              type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
             />
           </div>
         </div>
