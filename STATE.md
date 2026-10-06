@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-- **Active Phase**: Phase 11 — Testing
-- **Status**: COMPLETE (107 Vitest tests green; 23 Playwright E2E specs written)
-- **Last Updated**: 2026-09-21
+- **Active Phase**: Phase 10.1 — Section-Based Page Builder (see `PLAN-PAGE-BUILDER.md`)
+- **Status**: IN PROGRESS — plan documented; implementation started 2026-10-06
+- **Last Updated**: 2026-10-06
 
 ---
 
@@ -52,7 +52,7 @@
   - [x] E2E: `tests/e2e/storefront.spec.ts` — browse en/ar/fr, RTL check, catalog→detail, cart add/merge/clear, no stock API calls on add
   - [x] E2E: `tests/e2e/checkout-admin.spec.ts` — guest checkout → Pending, admin confirm removes it from queue, non-admin blocked, dashboard pending count
   - [x] Result: `npm run test` = 107/107 green; `npx playwright test --list` = 23 specs valid; `npx eslint tests …` clean
-- [ ] **Phase 12 — Security & validation hardening**
+- [ ] **Phase 10.1 — Section-based page builder** (plan: `PLAN-PAGE-BUILDER.md`)
 - [ ] **Phase 12 — Security & validation hardening**
 - [ ] **Phase 13 — Performance, SEO & accessibility pass**
 - [ ] **Phase 14 — Deployment**

@@ -1,6 +1,17 @@
 import { google } from "googleapis";
 import { TAB_HEADERS, readTab } from "../src/lib/data/sheetsClient";
 
+/** 0-based column index → spreadsheet letter (0 → A, 10 → K, 26 → AA). */
+function columnLetter(index: number): string {
+  let n = Math.max(0, index);
+  let letters = "";
+  do {
+    letters = String.fromCharCode(65 + (n % 26)) + letters;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return letters;
+}
+
 async function main() {
   console.log("📊 [EgyRock] Initializing database sheets & tabs...");
 
@@ -69,6 +80,22 @@ async function main() {
             values: [headers],
           },
         });
+      } else {
+        // Non-destructive migration: append any missing header columns
+        // (e.g. `sections`/`settings` on the Pages tab) without touching
+        // existing columns or data rows.
+        const existing = (checkRows.data.values[0] || []).map((h) => String(h ?? ""));
+        const missing = headers.filter((h) => !existing.includes(h));
+        for (const header of missing) {
+          const col = columnLetter(headers.indexOf(header));
+          console.log(`➕ Adding header column "${header}" to "${tabName}" (${col}1)...`);
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: sheetId!,
+            range: `${tabName}!${col}1:${col}1`,
+            valueInputOption: "USER_ENTERED",
+            requestBody: { values: [[header]] },
+          });
+        }
       }
     }
 

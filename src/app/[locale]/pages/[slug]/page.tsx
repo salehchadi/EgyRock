@@ -2,6 +2,9 @@ import React from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPageBySlug } from "@/lib/data/pages";
+import { getProducts } from "@/lib/data/products";
+import { PageRenderer } from "@/components/pages/PageRenderer";
+import { DEFAULT_PAGE_SETTINGS } from "@/lib/pageSections";
 
 export const dynamic = "force-dynamic";
 
@@ -98,10 +101,29 @@ export default async function StorefrontCustomPage({ params }: { params: PagePar
       content_fr: def.content_fr,
       is_published: true,
       updated_at: new Date().toISOString(),
+      sections: [],
+      settings: { ...DEFAULT_PAGE_SETTINGS },
     };
   }
 
   if (!page) notFound();
+
+  // Section-based pages render through the shared PageRenderer (the same
+  // component the admin builder previews with). Pages without sections
+  // keep the legacy title + plain-text body layout below.
+  if (page.sections.length > 0) {
+    const needsProducts = page.sections.some((s) => s.type === "products");
+    const products = needsProducts ? await getProducts() : [];
+    return (
+      <PageRenderer
+        title={{ en: page.title_en, ar: page.title_ar, fr: page.title_fr }}
+        sections={page.sections}
+        settings={page.settings}
+        locale={lang}
+        products={products}
+      />
+    );
+  }
 
   const title = page[`title_${lang}`] || page.title_en;
   const content = page[`content_${lang}`] || page.content_en;

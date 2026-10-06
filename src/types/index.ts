@@ -109,15 +109,137 @@ export interface TranslationRecord {
   fr: string;
 }
 
+/* ================================================================
+   PAGE BUILDER — section-based custom pages (Phase 10.1)
+   Every localized string is stored per locale (EN/AR/FR) so the
+   storefront renders the right language without extra lookups.
+   ================================================================ */
+
+export type PageLocale = "en" | "ar" | "fr";
+
+export interface LocalizedText {
+  en: string;
+  ar: string;
+  fr: string;
+}
+
+export type SectionType =
+  "hero" | "heading" | "text" | "image" | "gallery" | "faq" | "products" | "cta" | "divider";
+
+export type SectionAlign = "left" | "center";
+
+export interface PageSectionBase {
+  /** Stable client-generated key — never persisted as the page id. */
+  id: string;
+}
+
+export interface HeroSection extends PageSectionBase {
+  type: "hero";
+  title: LocalizedText;
+  subtitle: LocalizedText;
+  image_url: string;
+  button_label: LocalizedText;
+  button_link: string;
+  align: SectionAlign;
+}
+
+export interface HeadingSection extends PageSectionBase {
+  type: "heading";
+  text: LocalizedText;
+  level: 2 | 3;
+  align: SectionAlign;
+}
+
+export interface TextSection extends PageSectionBase {
+  type: "text";
+  /** Plain text — line breaks preserved (no markdown, no raw HTML). */
+  body: LocalizedText;
+  align: SectionAlign;
+}
+
+export interface ImageSection extends PageSectionBase {
+  type: "image";
+  image_url: string;
+  alt: LocalizedText;
+  caption: LocalizedText;
+}
+
+export interface GallerySection extends PageSectionBase {
+  type: "gallery";
+  images: string[];
+  alt: LocalizedText;
+  columns: 2 | 3 | 4;
+}
+
+export interface FaqItem {
+  id: string;
+  question: LocalizedText;
+  answer: LocalizedText;
+}
+
+export interface FaqSection extends PageSectionBase {
+  type: "faq";
+  title: LocalizedText;
+  items: FaqItem[];
+}
+
+export interface ProductsSection extends PageSectionBase {
+  type: "products";
+  title: LocalizedText;
+  /** Empty string = all products. */
+  category_id: string;
+  /** Number of cards to show (1–24). */
+  limit: number;
+}
+
+export interface CtaSection extends PageSectionBase {
+  type: "cta";
+  title: LocalizedText;
+  body: LocalizedText;
+  button_label: LocalizedText;
+  button_link: string;
+}
+
+export interface DividerSection extends PageSectionBase {
+  type: "divider";
+  style: "line" | "stamp";
+}
+
+export type PageSection =
+  | HeroSection
+  | HeadingSection
+  | TextSection
+  | ImageSection
+  | GallerySection
+  | FaqSection
+  | ProductsSection
+  | CtaSection
+  | DividerSection;
+
+export type PageWidth = "narrow" | "wide" | "full";
+export type PageBackground = "default" | "surface" | "sunken" | "brand-tint";
+
+export interface PageSettings {
+  width: PageWidth;
+  background: PageBackground;
+  /** Whether the page H1 header block is rendered above the sections. */
+  show_title: boolean;
+}
+
 export interface CustomPage {
   id: string;
   slug: string;
   title_en: string;
   title_ar: string;
   title_fr: string;
+  /** Legacy plain-text body — still rendered when `sections` is empty. */
   content_en: string;
   content_ar: string;
   content_fr: string;
   is_published: boolean;
   updated_at: string;
+  /** Builder blocks (JSON cell). Empty array = legacy page layout. */
+  sections: PageSection[];
+  /** Page-level layout settings (JSON cell). */
+  settings: PageSettings;
 }

@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { resetStore, seedRows, dataRows, buildFakeSheetsModule } from "../helpers/fakeSheets";
+import type { PageSection, TextSection } from "@/types";
 
 /**
  * ARCHITECTURE.md §3 — Data Access Layer (DAL) pattern.
@@ -39,6 +40,7 @@ import {
 } from "@/lib/data/homepageImages";
 import { getTranslations, getTranslationsMap, upsertTranslation } from "@/lib/data/translations";
 import { getPages, getPageBySlug, createPage, updatePage, deletePage } from "@/lib/data/pages";
+import { DEFAULT_PAGE_SETTINGS } from "@/lib/pageSections";
 import type { Product } from "@/types";
 
 function product(overrides: Partial<Product> = {}): Omit<Product, "created_at"> {
@@ -533,11 +535,19 @@ describe("pages DAL — dynamic content pages", () => {
     content_fr: "Boutique du Caire",
     is_published: true,
     updated_at: "2026-01-01T00:00:00.000Z",
+    // Builder columns: a legacy 10-column row parses to these defaults.
+    sections: [],
+    settings: { ...DEFAULT_PAGE_SETTINGS },
   };
 
-  function pageRow(overrides: Partial<typeof draftPage> = {}): unknown[] {
+  type LegacyPageFields = Omit<typeof draftPage, "sections" | "settings">;
+
+  function pageRow(
+    overrides: Partial<LegacyPageFields> = {},
+    jsonCells: { sections?: string; settings?: string } = {},
+  ): unknown[] {
     const p = { ...draftPage, ...overrides };
-    return [
+    const row: unknown[] = [
       p.id,
       p.slug,
       p.title_en,
@@ -549,6 +559,10 @@ describe("pages DAL — dynamic content pages", () => {
       p.is_published ? "true" : "false",
       p.updated_at,
     ];
+    if (jsonCells.sections !== undefined || jsonCells.settings !== undefined) {
+      row.push(jsonCells.sections ?? "", jsonCells.settings ?? "");
+    }
+    return row;
   }
 
   it("parses published pages including the boolean column", async () => {
@@ -655,5 +669,136 @@ describe("pages DAL — dynamic content pages", () => {
   it("throws for unknown ids on update and delete", async () => {
     await expect(updatePage("ghost", { title_en: "x" })).rejects.toThrow(/not found/i);
     await expect(deletePage("ghost")).rejects.toThrow(/not found/i);
+  });
+
+  /* ----------------------- section-builder columns ----------------------- */
+
+  it("parses legacy 10-column rows with empty sections and default settings", async () => {
+    seedRows("Pages", [pageRow()]);
+
+    const [page] = await getPages();
+    expect(page.sections).toEqual([]);
+    expect(page.settings).toEqual(DEFAULT_PAGE_SETTINGS);
+  });
+
+  it("parses the sections and settings JSON cells", async () => {
+    const hero = {
+      id: "hero-1",
+      type: "hero",
+      title: { en: "Loud", ar: "صاخب", fr: "Fort" },
+      subtitle: { en: "Cairo rock", ar: "", fr: "" },
+      image_url: "/images/placeholders/egyrock-1.jpeg",
+      button_label: { en: "Shop", ar: "", fr: "" },
+      button_link: "/en/catalog",
+      align: "center",
+    };
+    const settings = { width: "narrow", background: "sunken", show_title: false };
+    seedRows("Pages", [
+      pageRow({}, { sections: JSON.stringify([hero]), settings: JSON.stringify(settings) }),
+    ]);
+
+    const [page] = await getPages();
+    expect(page.sections).toEqual([hero]);
+    expect(page.settings).toEqual(settings);
+  });
+
+  it("falls back to empty sections and default settings when the JSON cells are malformed", async () => {
+    seedRows("Pages", [pageRow({}, { sections: "{not-json", settings: "[1,2,3]" })]);
+
+    const [page] = await getPages();
+    expect(page.sections).toEqual([]);
+    expect(page.settings).toEqual(DEFAULT_PAGE_SETTINGS);
+  });
+
+  it("round-trips sections and settings through createPage", async () => {
+    const sections: PageSection[] = [
+      {
+        id: "txt-1",
+        type: "text",
+        body: { en: "Hello", ar: "مرحبا", fr: "Bonjour" },
+        align: "left",
+      },
+    ];
+    const settings = { width: "narrow", background: "brand-tint", show_title: false } as const;
+
+    const created = await createPage({
+      slug: "builder",
+      title_en: "Builder",
+      title_ar: "البناء",
+      title_fr: "Constructeur",
+      content_en: "",
+      content_ar: "",
+      content_fr: "",
+      is_published: true,
+      sections,
+      settings,
+    });
+
+    expect(created.sections).toHaveLength(1);
+    expect(created.settings).toEqual(settings);
+
+    // The write serializes to JSON cells; the storefront read parses them back.
+    const fetched = await getPageBySlug("builder");
+    expect(fetched?.sections).toEqual(created.sections);
+    expect(fetched?.settings).toEqual(settings);
+  });
+
+  it("keeps sections on updates that omit them and replaces them when provided", async () => {
+    const sections = [
+      { id: "txt-1", type: "text", body: { en: "Old", ar: "", fr: "" }, align: "left" },
+    ];
+    seedRows("Pages", [pageRow({}, { sections: JSON.stringify(sections) })]);
+
+    const untouched = await updatePage("about", { content_en: "Changed" });
+    expect(untouched.sections).toHaveLength(1);
+    expect((await getPages())[0].sections).toHaveLength(1);
+
+    const replaced = await updatePage("about", { sections: [] });
+    expect(replaced.sections).toEqual([]);
+    expect((await getPages())[0].sections).toEqual([]);
+  });
+
+  it("refuses to save pages with unknown section types", async () => {
+    await expect(
+      createPage({
+        slug: "bad-type",
+        title_en: "Bad",
+        title_ar: "",
+        title_fr: "",
+        content_en: "",
+        content_ar: "",
+        content_fr: "",
+        is_published: true,
+        sections: [{ id: "nope", type: "marquee" } as any],
+      }),
+    ).rejects.toThrow(/Invalid section #1/);
+
+    expect(await getPages()).toHaveLength(0);
+  });
+
+  it("rejects pages whose serialized sections exceed the Sheets cell cap", async () => {
+    const bigBody = "x".repeat(20_000);
+    const bigSection = (id: string): TextSection => ({
+      id,
+      type: "text",
+      body: { en: bigBody, ar: "", fr: "" },
+      align: "left",
+    });
+
+    await expect(
+      createPage({
+        slug: "too-big",
+        title_en: "Big",
+        title_ar: "",
+        title_fr: "",
+        content_en: "",
+        content_ar: "",
+        content_fr: "",
+        is_published: false,
+        sections: [bigSection("a"), bigSection("b"), bigSection("c")],
+      }),
+    ).rejects.toThrow(/too large/i);
+
+    expect(await getPages()).toHaveLength(0);
   });
 });

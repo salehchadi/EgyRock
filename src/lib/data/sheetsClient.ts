@@ -73,6 +73,8 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "content_fr",
     "is_published",
     "updated_at",
+    "sections",
+    "settings",
   ],
 };
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { updatePage, deletePage } from "@/lib/data/pages";
+import { normalizeSettings, validateSections } from "@/lib/pageSections";
 
 function isAdmin(s: any) {
   return s?.user && (s.user as any).role === "admin";
@@ -27,6 +28,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       content_ar: body.content_ar,
       content_fr: body.content_fr,
       is_published: body.is_published !== undefined ? Boolean(body.is_published) : undefined,
+      sections: body.sections !== undefined ? validateSections(body.sections) : undefined,
+      settings: body.settings !== undefined ? normalizeSettings(body.settings) : undefined,
     });
     return NextResponse.json({ page });
   } catch (e: any) {
