@@ -15,6 +15,10 @@ export interface Product {
   created_at: string;
   /** Available sizes for wearables (e.g. ["S","M","L"]). Empty = one-size product. */
   sizes: string[];
+  /** Discount percentage set by admin (0-100). */
+  discount_percent?: number;
+  /** Available colors for wearables (e.g. ["Black", "White"]). */
+  colors?: string[];
 }
 
 export interface Category {
@@ -33,6 +37,8 @@ export interface OrderItem {
   unit_price: number;
   /** Selected size for wearable products (if any). */
   size?: string;
+  /** Selected color for wearable products (if any). */
+  color?: string;
 }
 
 export type OrderStatus = "Pending payment" | "Confirmed" | "Rejected";
@@ -71,6 +77,12 @@ export interface User {
   address: string;
   gender: Gender | "";
   age: string;
+  birthday?: string;
+  governorate?: string;
+  city?: string;
+  region?: string;
+  street?: string;
+  building?: string;
 }
 
 export type CouponType = "percent" | "fixed";

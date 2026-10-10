@@ -15,6 +15,12 @@ function rowToUser(row: string[]): User {
     address: row[7] || "",
     gender: (row[8] as User["gender"]) || "",
     age: row[9] || "",
+    governorate: row[10] || "",
+    city: row[11] || "",
+    region: row[12] || "",
+    street: row[13] || "",
+    building: row[14] || "",
+    birthday: row[15] || row[9] || "",
   };
 }
 
@@ -29,7 +35,13 @@ function userToRow(u: User): any[] {
     u.phone || "",
     u.address || "",
     u.gender || "",
-    u.age || "",
+    u.age || u.birthday || "",
+    u.governorate || "",
+    u.city || "",
+    u.region || "",
+    u.street || "",
+    u.building || "",
+    u.birthday || u.age || "",
   ];
 }
 
@@ -56,14 +68,39 @@ export async function getUserById(id: string): Promise<User | null> {
 
 /**
  * Input accepted by `createUser`.
- * Identity fields are required; profile fields (phone, address, gender, age) are
+ * Identity fields are required; profile fields are
  * collected by the registration form and default to empty strings when omitted.
  */
 export type CreateUserInput = Omit<
   User,
-  "id" | "created_at" | "phone" | "address" | "gender" | "age"
+  | "id"
+  | "created_at"
+  | "phone"
+  | "address"
+  | "gender"
+  | "age"
+  | "birthday"
+  | "governorate"
+  | "city"
+  | "region"
+  | "street"
+  | "building"
 > &
-  Partial<Pick<User, "phone" | "address" | "gender" | "age">>;
+  Partial<
+    Pick<
+      User,
+      | "phone"
+      | "address"
+      | "gender"
+      | "age"
+      | "birthday"
+      | "governorate"
+      | "city"
+      | "region"
+      | "street"
+      | "building"
+    >
+  >;
 
 export async function createUser(data: CreateUserInput): Promise<User> {
   if (!data.email || !data.password_hash) {
@@ -82,6 +119,12 @@ export async function createUser(data: CreateUserInput): Promise<User> {
     address: "",
     gender: "",
     age: "",
+    birthday: "",
+    governorate: "",
+    city: "",
+    region: "",
+    street: "",
+    building: "",
     ...data,
     id: userId,
     email: data.email.toLowerCase().trim(),

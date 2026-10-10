@@ -124,7 +124,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                 href="/catalog"
                 className="inline-block px-5 py-2.5 border-2 border-brand text-brand hover:bg-brand hover:text-white font-heading uppercase text-xs tracking-wider transition"
               >
-                {isArabic ? "تصفح المنتجات الآن" : "EXPLORE MERCH NOW"}
+                {isArabic ? "ابدأ التسوق" : "START SHOPPING"}
               </Link>
             </div>
           </div>

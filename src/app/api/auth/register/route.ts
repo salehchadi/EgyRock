@@ -5,7 +5,21 @@ import { createUser, getUserByEmail } from "@/lib/data/users";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password, phone, address, gender, age } = body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      address,
+      gender,
+      age,
+      birthday,
+      governorate,
+      city,
+      region,
+      street,
+      building,
+    } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -14,23 +28,33 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!phone || !address || !gender || !age) {
+    // Build composite address if structured parts are provided
+    const compositeAddress =
+      address || [street, building, region, city, governorate].filter(Boolean).join(", ") || "";
+
+    if (!phone || !compositeAddress || !gender) {
       return NextResponse.json(
-        { error: "Phone, location address, gender, and age are required" },
+        { error: "Phone, location address, and gender are required" },
         { status: 400 },
       );
+    }
+
+    if (!birthday && !age) {
+      return NextResponse.json({ error: "Birthday is required" }, { status: 400 });
     }
 
     if (!["male", "female", "other"].includes(gender)) {
       return NextResponse.json({ error: "Invalid gender value" }, { status: 400 });
     }
 
-    const ageNum = parseInt(String(age), 10);
-    if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
-      return NextResponse.json(
-        { error: "Age must be a number between 13 and 120" },
-        { status: 400 },
-      );
+    let calculatedAge = 20;
+    if (birthday) {
+      const birthYear = new Date(birthday).getFullYear();
+      if (!isNaN(birthYear)) {
+        calculatedAge = new Date().getFullYear() - birthYear;
+      }
+    } else if (age) {
+      calculatedAge = parseInt(String(age), 10);
     }
 
     if (password.length < 6) {
@@ -56,9 +80,15 @@ export async function POST(request: Request) {
       password_hash: passwordHash,
       role: "customer",
       phone: String(phone).trim(),
-      address: String(address).trim(),
+      address: String(compositeAddress).trim(),
       gender,
-      age: String(ageNum),
+      age: String(calculatedAge),
+      birthday: birthday || "",
+      governorate: governorate || "",
+      city: city || "",
+      region: region || "",
+      street: street || "",
+      building: building || "",
     });
 
     return NextResponse.json({

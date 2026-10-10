@@ -83,9 +83,8 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
           </button>
         </div>
 
-        {/* Scrollable content */}
+        {/* Scrollable content — flat list, no section dividers */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          {/* Primary links */}
           <Link href="/" onClick={onClose} className={linkClass()}>
             {t("home")}
           </Link>
@@ -95,23 +94,8 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
           <Link href="/pages/how-to-pay" onClick={onClose} className={linkClass()}>
             {t("howToPay")}
           </Link>
-          <Link href="/pages/about" onClick={onClose} className={linkClass()}>
-            {t("about")}
-          </Link>
 
-          {/* Categories with expandable sub-categories */}
-          <div className="px-4 pt-5 pb-2">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted">
-              {isArabic ? "الأقسام" : locale === "fr" ? "Catégories" : "Categories"}
-            </span>
-          </div>
-
-          {topLevel.length === 0 && (
-            <p className="px-4 py-3 text-xs text-muted uppercase">
-              {isArabic ? "لا توجد أقسام" : "No categories yet"}
-            </p>
-          )}
-
+          {/* Categories inline (expandable sub-categories preserved) */}
           {topLevel.map((cat) => {
             const children = childrenOf(cat.id);
             const isOpen = expanded[cat.id] || false;
@@ -123,7 +107,7 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
                     href={`/catalog?category=${cat.id}`}
                     onClick={onClose}
                     className={`flex-1 px-4 py-3 text-sm uppercase tracking-wider text-ink hover:text-brand hover:bg-surface transition ${
-                      isArabic ? "font-arabic-heading font-semibold" : "font-heading"
+                      isArabic ? "font-arabic-heading" : "font-heading"
                     }`}
                   >
                     {catName(cat)}
@@ -174,13 +158,6 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
             );
           })}
 
-          {/* Account section */}
-          <div className="px-4 pt-5 pb-2">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted">
-              {isArabic ? "الحساب" : locale === "fr" ? "Compte" : "Account"}
-            </span>
-          </div>
-
           <Link href="/cart" onClick={onClose} className={linkClass()}>
             {t("cart")} ({totalItems})
           </Link>
@@ -204,6 +181,11 @@ export function MenuDrawer({ open, onClose, categories }: MenuDrawerProps) {
 
           <Link href="/style-guide" onClick={onClose} className={linkClass()}>
             {t("styleGuide")}
+          </Link>
+
+          {/* About Us — always last link before language switcher */}
+          <Link href="/pages/about" onClick={onClose} className={linkClass()}>
+            {t("about")}
           </Link>
 
           {/* Language switcher */}

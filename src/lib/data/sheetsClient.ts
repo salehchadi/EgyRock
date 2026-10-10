@@ -19,6 +19,8 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "images",
     "created_at",
     "sizes",
+    "discount_percent",
+    "colors",
   ],
   Categories: ["id", "name_en", "name_ar", "name_fr", "parent_id"],
   Orders: [
@@ -47,6 +49,12 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "address",
     "gender",
     "age",
+    "governorate",
+    "city",
+    "region",
+    "street",
+    "building",
+    "birthday",
   ],
   Coupons: [
     "id",
@@ -76,6 +84,7 @@ export const TAB_HEADERS: Record<string, string[]> = {
     "sections",
     "settings",
   ],
+  Settings: ["key", "value"],
 };
 
 function isGoogleSheetsConfigured(): boolean {
@@ -204,6 +213,38 @@ function reconcileHeaders(tabName: string, db: Record<string, any[][]>): any[][]
   return migrated;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isQuotaError(err: any): boolean {
+  const message = err?.message || String(err || "");
+  return /quota/i.test(message) || err?.response?.status === 429 || err?.code === 429;
+}
+
+/**
+ * Retries a Google Sheets call with exponential backoff when the per-minute
+ * read quota is exhausted. The full E2E suite fires bursts of tab reads per
+ * page render, eclipsing the quota and collapsing reads into the fallback
+ * store; pacing the retries usually clears the window before the fallback is
+ * ever needed.
+ */
+async function withQuotaRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  let attempt = 0;
+  for (;;) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      if (isQuotaError(err) && attempt < 4) {
+        const delay = 1000 * Math.pow(2, attempt);
+        console.warn(`[GoogleSheets DAL] Read quota hit (${label}); retrying in ${delay}ms...`);
+        await sleep(delay);
+        attempt++;
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 export async function readTab(tabName: string): Promise<string[][]> {
   if (isGoogleSheetsConfigured()) {
     try {
@@ -211,13 +252,22 @@ export async function readTab(tabName: string): Promise<string[][]> {
       const sheets = google.sheets({ version: "v4", auth });
       const spreadsheetId = process.env.GOOGLE_SHEET_ID!;
 
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: `${tabName}!A:Z`,
-      });
+      const response = await withQuotaRetry(tabName, () =>
+        sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: `${tabName}!A:Z`,
+        }),
+      );
 
       const rows = response.data.values || [];
-      if (rows.length > 0) {
+      if (rows.length > 1) {
+        return rows.map((r) => r.map((c) => String(c ?? "")));
+      }
+      if (rows.length === 1) {
+        const db = getLocalDb();
+        if (db[tabName] && db[tabName].length > 1) {
+          return db[tabName].map((row) => row.map((c) => String(c ?? "")));
+        }
         return rows.map((r) => r.map((c) => String(c ?? "")));
       }
     } catch (err: any) {
@@ -251,7 +301,10 @@ export async function appendRow(tabName: string, rowValues: any[]): Promise<void
       await sheets.spreadsheets.values.append({
         spreadsheetId,
         range: `${tabName}!A:Z`,
-        valueInputOption: "USER_ENTERED",
+        // RAW keeps values as the literal strings the app writes (e.g.
+        // is_published "true" stays "true"). USER_ENTERED coerces them,
+        // so Sheets reads back booleans as "TRUE" which row parsers miss.
+        valueInputOption: "RAW",
         requestBody: {
           values: [rowValues.map((v) => (v === undefined || v === null ? "" : String(v)))],
         },
@@ -308,7 +361,9 @@ export async function updateRow(
       await sheets.spreadsheets.values.update({
         spreadsheetId,
         range: `${tabName}!A${rowIndex}:Z${rowIndex}`,
-        valueInputOption: "USER_ENTERED",
+        // RAW (see appendRow) — USER_ENTERED would coerce "true"/"false"
+        // into sheet booleans that read back as "TRUE"/"FALSE".
+        valueInputOption: "RAW",
         requestBody: {
           values: [rowValues.map((v) => (v === undefined || v === null ? "" : String(v)))],
         },

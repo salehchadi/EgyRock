@@ -5,6 +5,7 @@ const BASE_URL = process.env.E2E_BASE_URL || `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   // The storefront and admin panel share one Google Sheets-backed database,
   // so serialize the flows instead of racing writes against each other.
   fullyParallel: false,
@@ -21,7 +22,14 @@ export default defineConfig({
     video: "retain-on-failure",
     actionTimeout: 15_000,
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      // Favour the full Chromium build in headless mode (avoids the extra
+      // headless-shell download and matches the installed browser revision).
+      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+    },
+  ],
   // Boots the Next.js dev server automatically. Point E2E_BASE_URL at an
   // already-running deployment (e.g. a Vercel preview) to skip this.
   webServer: process.env.E2E_BASE_URL

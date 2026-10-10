@@ -30,6 +30,10 @@ function rowToOrder(row: string[]): Order {
 }
 
 function orderToRow(o: Order): any[] {
+  let receipt = o.receipt_image_url || "";
+  if (receipt.length > 45000) {
+    receipt = receipt.slice(0, 45000);
+  }
   return [
     o.id,
     o.user_id,
@@ -39,7 +43,7 @@ function orderToRow(o: Order): any[] {
     JSON.stringify(o.items),
     o.total,
     o.status,
-    o.receipt_image_url,
+    receipt,
     o.created_at,
     o.confirmed_at || "",
     o.coupon_code || "",
@@ -51,10 +55,19 @@ export async function getOrders(): Promise<Order[]> {
   const rows = await readTab(TAB);
   if (rows.length <= 1) return [];
 
-  return rows
-    .slice(1)
-    .map(rowToOrder)
-    .filter((o) => Boolean(o.id));
+  const seen = new Set<string>();
+  const orders: Order[] = [];
+
+  for (const row of rows.slice(1)) {
+    const o = rowToOrder(row);
+    if (!o.id || seen.has(o.id)) continue;
+    seen.add(o.id);
+    orders.push(o);
+  }
+
+  // Show newest orders first
+  orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return orders;
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {

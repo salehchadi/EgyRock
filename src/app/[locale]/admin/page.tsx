@@ -67,6 +67,12 @@ export default async function AdminDashboardPage({
       path: "/admin/translations" as const,
       count: `${translations.length} Keys`,
     },
+    {
+      title: "Store Settings",
+      desc: "Control InstaPay payment handle, direct payment links, and store config",
+      path: "/admin/settings" as const,
+      count: "Config",
+    },
   ];
 
   return (

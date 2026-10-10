@@ -29,6 +29,22 @@ function rowToProduct(row: string[]): Product {
     sizes = [];
   }
 
+  let colors: string[] = [];
+  try {
+    if (row[14]) {
+      colors = row[14].startsWith("[")
+        ? JSON.parse(row[14])
+        : row[14]
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+    }
+  } catch {
+    colors = [];
+  }
+
+  const discount_percent = Math.min(100, Math.max(0, parseInt(row[13] || "0", 10) || 0));
+
   return {
     id: row[0] || "",
     category_id: row[1] || "",
@@ -43,6 +59,8 @@ function rowToProduct(row: string[]): Product {
     images: images.filter(Boolean),
     created_at: row[11] || new Date().toISOString(),
     sizes,
+    discount_percent,
+    colors,
   };
 }
 
@@ -61,6 +79,8 @@ function productToRow(p: Product): any[] {
     JSON.stringify(p.images),
     p.created_at,
     JSON.stringify(p.sizes || []),
+    p.discount_percent || 0,
+    JSON.stringify(p.colors || []),
   ];
 }
 

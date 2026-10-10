@@ -22,6 +22,8 @@ const EMPTY_PRODUCT = {
   images: "",
   // Wearables: comma-separated list (e.g. "S, M, L"). Empty = one-size product.
   sizes: "",
+  discount_percent: 0,
+  colors: "",
 };
 
 export default function AdminProductsClient({
@@ -55,6 +57,8 @@ export default function AdminProductsClient({
       category_id: p.category_id,
       images: Array.isArray(p.images) ? p.images.join(", ") : p.images || "",
       sizes: Array.isArray(p.sizes) ? p.sizes.join(", ") : "",
+      discount_percent: p.discount_percent || 0,
+      colors: Array.isArray(p.colors) ? p.colors.join(", ") : "",
     });
     setEditing(p);
     setCreating(false);
@@ -87,6 +91,13 @@ export default function AdminProductsClient({
             : [],
           sizes: form.sizes
             ? String(form.sizes)
+                .split(",")
+                .map((s: string) => s.trim())
+                .filter(Boolean)
+            : [],
+          discount_percent: Number(form.discount_percent) || 0,
+          colors: form.colors
+            ? String(form.colors)
                 .split(",")
                 .map((s: string) => s.trim())
                 .filter(Boolean)
@@ -189,7 +200,7 @@ export default function AdminProductsClient({
               ))}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-4">
               <div>
                 <label className="label-field">Price (EGP)</label>
                 <input
@@ -198,6 +209,19 @@ export default function AdminProductsClient({
                   name="price"
                   value={form.price}
                   onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label className="label-field">Discount (%)</label>
+                <input
+                  className="admin-input"
+                  type="number"
+                  min={0}
+                  max={100}
+                  name="discount_percent"
+                  value={form.discount_percent}
+                  onChange={handleChange}
+                  placeholder="0"
                 />
               </div>
               <div>
@@ -238,20 +262,28 @@ export default function AdminProductsClient({
               />
             </div>
 
-            {/* Wearables only: sizes offered on the product page and cart */}
-            <div className="mb-6">
-              <label className="label-field">Sizes (comma-separated)</label>
-              <input
-                className="admin-input"
-                name="sizes"
-                value={form.sizes}
-                onChange={handleChange}
-                placeholder="S, M, L, XL — leave empty for one-size products"
-              />
-              <p className="mt-1.5 text-[11px] text-muted">
-                Leave empty for accessories (mugs, picks, …). Customers must pick a size for
-                products that list one.
-              </p>
+            {/* Wearables only: sizes and colors offered on the product page and cart */}
+            <div className="grid sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="label-field">Sizes (comma-separated)</label>
+                <input
+                  className="admin-input"
+                  name="sizes"
+                  value={form.sizes}
+                  onChange={handleChange}
+                  placeholder="S, M, L, XL — leave empty if none"
+                />
+              </div>
+              <div>
+                <label className="label-field">Colors (comma-separated)</label>
+                <input
+                  className="admin-input"
+                  name="colors"
+                  value={form.colors}
+                  onChange={handleChange}
+                  placeholder="Black, White, Charcoal — leave empty if none"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

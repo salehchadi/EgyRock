@@ -26,11 +26,28 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             .filter(Boolean);
     }
 
+    let colors: string[] | undefined;
+    if (body.colors !== undefined) {
+      colors = Array.isArray(body.colors)
+        ? body.colors.map((s: any) => String(s).trim()).filter(Boolean)
+        : String(body.colors)
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+    }
+
+    const discount_percent =
+      body.discount_percent !== undefined
+        ? Math.min(100, Math.max(0, Number(body.discount_percent) || 0))
+        : undefined;
+
     const product = await updateProduct(id, {
       ...body,
-      price: Number(body.price),
-      quantity: Number(body.quantity),
+      price: body.price !== undefined ? Number(body.price) : undefined,
+      quantity: body.quantity !== undefined ? Number(body.quantity) : undefined,
       ...(sizes !== undefined ? { sizes } : {}),
+      ...(colors !== undefined ? { colors } : {}),
+      ...(discount_percent !== undefined ? { discount_percent } : {}),
     });
     return NextResponse.json({ product });
   } catch (error: any) {

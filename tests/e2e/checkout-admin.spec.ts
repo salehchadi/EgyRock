@@ -10,8 +10,10 @@ import {
 const CUSTOMER = {
   customer_name: "E2E Tester",
   customer_phone: "01001234567",
-  shipping_address: "123 Corniche El Nil, Cairo",
-  city: "Cairo",
+  governorate: "Cairo",
+  city: "Maadi",
+  region: "Degla",
+  street: "St. 9, Bldg 12",
 };
 
 /** Writes the generated receipt PNG into the OS temp dir for setInputFiles. */
@@ -37,11 +39,13 @@ test.describe("Checkout and manual InstaPay flow", () => {
 
     await page.goto("/en/checkout");
 
-    // Ships details form
+    // Ships details form (structured address breakdown)
     await page.locator('input[name="customer_name"]').fill(CUSTOMER.customer_name);
     await page.locator('input[name="customer_phone"]').fill(CUSTOMER.customer_phone);
-    await page.locator('textarea[name="shipping_address"]').fill(CUSTOMER.shipping_address);
+    await page.locator('input[name="governorate"]').fill(CUSTOMER.governorate);
     await page.locator('input[name="city"]').fill(CUSTOMER.city);
+    await page.locator('input[name="region"]').fill(CUSTOMER.region);
+    await page.locator('input[name="street"]').fill(CUSTOMER.street);
 
     // InstaPay receipt upload (base64-compressed client side)
     const receiptPath = await writeReceiptFixture(testInfo.outputDir);
@@ -79,8 +83,10 @@ test.describe("Admin order confirmation closes the loop", () => {
     await page.goto("/en/checkout");
     await page.locator('input[name="customer_name"]').fill(CUSTOMER.customer_name);
     await page.locator('input[name="customer_phone"]').fill(CUSTOMER.customer_phone);
-    await page.locator('textarea[name="shipping_address"]').fill(CUSTOMER.shipping_address);
+    await page.locator('input[name="governorate"]').fill(CUSTOMER.governorate);
     await page.locator('input[name="city"]').fill(CUSTOMER.city);
+    await page.locator('input[name="region"]').fill(CUSTOMER.region);
+    await page.locator('input[name="street"]').fill(CUSTOMER.street);
     const receiptPath = await writeReceiptFixture(testInfo.outputDir);
     await page
       .locator('input[type="file"]')
@@ -135,14 +141,17 @@ test.describe("Admin order confirmation closes the loop", () => {
 
     const nameField = page.locator('input[name="name"]');
     if ((await nameField.count()) > 0) {
-      await nameField.fill(name);
+      await page.locator('input[name="name"]').fill(name);
       await page.locator('input[name="email"]').fill(email);
       await page.locator('input[name="password"]').first().fill("Customer123!");
-      const confirmField = page.locator(
-        'input[name="confirmPassword"], input[name="confirm_password"]',
-      );
-      if ((await confirmField.count()) > 0) await confirmField.fill("Customer123!");
-      await page.getByRole("button", { name: /register|sign up|create/i }).click();
+      await page.locator('input[name="phone"]').fill("01001234567");
+      await page.locator('input[name="governorate"]').fill("Cairo");
+      await page.locator('input[name="city"]').fill("Maadi");
+      await page.locator('input[name="region"]').fill("Degla");
+      await page.locator('input[name="street"]').fill("St. 9, Bldg 12");
+      await page.locator('select[name="gender"]').selectOption("male");
+      await page.locator('input[name="birthday"]').fill("1990-05-15");
+      await page.getByRole("button", { name: /create account/i }).click();
       await page.waitForURL((url) => !url.pathname.includes("/auth/register"), {
         timeout: 30_000,
       });

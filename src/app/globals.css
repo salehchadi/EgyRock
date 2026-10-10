@@ -131,15 +131,35 @@ video {
 
 .font-body {
   font-family: var(--font-oswald), sans-serif;
+  font-weight: 400;
 }
 
 .font-arabic-heading {
   font-family: var(--font-cairo), sans-serif;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .font-arabic-body {
   font-family: var(--font-almarai), sans-serif;
+  font-weight: 400;
+}
+
+/* User requirement #6: Remove bold everywhere in all text even the titles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th,
+.font-heading,
+.font-arabic-heading,
+.font-bold,
+.font-extrabold,
+.font-semibold {
+  font-weight: 400 !important;
 }
 
 /* ===== Menu drawer slide-in animation =====

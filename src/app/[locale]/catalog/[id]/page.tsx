@@ -9,6 +9,7 @@ import { calculateStockStatus } from "@/lib/stock";
 import { PosterBadge } from "@/components/ui/PosterBadge";
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
+import { getSettings } from "@/lib/data/settings";
 
 export const revalidate = 0;
 
@@ -20,7 +21,7 @@ export default async function ProductDetailPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const product = await getProductById(id);
+  const [product, settings] = await Promise.all([getProductById(id), getSettings()]);
   if (!product) {
     notFound();
   }
@@ -99,7 +100,7 @@ export default async function ProductDetailPage({
           {/* Title */}
           <h1
             className={`text-3xl sm:text-4xl lg:text-5xl uppercase text-ink leading-tight ${
-              isArabic ? "font-arabic-heading font-bold" : "font-heading"
+              isArabic ? "font-arabic-heading" : "font-heading"
             }`}
           >
             {title}
@@ -118,6 +119,11 @@ export default async function ProductDetailPage({
                 {isArabic ? "اطلب الآن!" : "ORDER NOW!"}
               </span>
             )}
+            {Boolean(product.discount_percent && product.discount_percent > 0) && (
+              <span className="text-xs bg-brand text-white px-2 py-1 uppercase tracking-wider font-heading">
+                -{product.discount_percent}% OFF
+              </span>
+            )}
           </div>
 
           {/* Price */}
@@ -125,13 +131,26 @@ export default async function ProductDetailPage({
             <span className="text-xs text-muted uppercase font-mono">
               {isArabic ? "السعر" : isFrench ? "Prix" : "PRICE"}
             </span>
-            <span
-              className={`text-3xl sm:text-4xl text-ink ${
-                isArabic ? "font-arabic-heading font-bold" : "font-heading"
-              }`}
-            >
-              {product.price}
-            </span>
+            {Boolean(product.discount_percent && product.discount_percent > 0) ? (
+              <div className="flex items-baseline gap-3">
+                <span
+                  className={`text-3xl sm:text-4xl text-brand ${
+                    isArabic ? "font-arabic-heading" : "font-heading"
+                  }`}
+                >
+                  {Math.round(product.price * (1 - product.discount_percent! / 100))}
+                </span>
+                <span className="text-lg text-muted line-through font-mono">{product.price}</span>
+              </div>
+            ) : (
+              <span
+                className={`text-3xl sm:text-4xl text-ink ${
+                  isArabic ? "font-arabic-heading" : "font-heading"
+                }`}
+              >
+                {product.price}
+              </span>
+            )}
             <span className="text-sm text-muted font-mono">{isArabic ? "ج.م" : "EGP"}</span>
           </div>
 
@@ -179,7 +198,7 @@ export default async function ProductDetailPage({
             <div className="flex items-start gap-3 border-t border-line pt-3">
               <span className="text-brand text-lg mt-0.5">💳</span>
               <div>
-                <p className="text-xs font-bold uppercase text-ink tracking-wider">
+                <p className="text-xs uppercase text-ink tracking-wider">
                   {isArabic
                     ? "الدفع عبر InstaPay"
                     : isFrench
@@ -188,12 +207,12 @@ export default async function ProductDetailPage({
                 </p>
                 <p className="text-[11px] text-muted mt-1">
                   {isArabic
-                    ? "أرسل المبلغ إلى egyrock@instapay ثم ارفع لقطة شاشة الإيصال أثناء الدفع."
+                    ? `أرسل المبلغ إلى ${settings.instapay_handle} ثم ارفع لقطة شاشة الإيصال أثناء الدفع.`
                     : isFrench
-                      ? "Envoyez le montant à egyrock@instapay puis téléchargez la capture d'écran du reçu."
-                      : "Send amount to egyrock@instapay then upload receipt screenshot at checkout."}
+                      ? `Envoyez le montant à ${settings.instapay_handle} puis téléchargez la capture d'écran du reçu.`
+                      : `Send amount to ${settings.instapay_handle} then upload receipt screenshot at checkout.`}
                 </p>
-                <p className="text-[11px] text-brand font-bold mt-1 font-mono">egyrock@instapay</p>
+                <p className="text-[11px] text-brand mt-1 font-mono">{settings.instapay_handle}</p>
               </div>
             </div>
           </div>

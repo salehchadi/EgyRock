@@ -165,7 +165,7 @@ export default function AdminCouponsClient({ coupons: initialCoupons, locale }: 
                   name="code"
                   value={form.code}
                   onChange={handleChange}
-                  placeholder="e.g. ROCK10"
+                  placeholder="ROCK10"
                 />
               </div>
 

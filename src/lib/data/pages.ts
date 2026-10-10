@@ -22,7 +22,9 @@ function rowToPage(row: string[]): CustomPage {
     content_en: row[5] || "",
     content_ar: row[6] || "",
     content_fr: row[7] || "",
-    is_published: row[8] === "true" || row[8] === "1",
+    // Case-insensitive so rows written by older USER_ENTERED appends
+    // (Sheets stores the boolean as "TRUE"/"FALSE") still parse correctly.
+    is_published: ["true", "1", "yes"].includes(String(row[8]).toLowerCase()),
     updated_at: row[9] || new Date().toISOString(),
     // Legacy 10-column rows end here — missing cells safely parse as empty/default.
     sections: parseSectionsCell(row[10]),
@@ -52,10 +54,20 @@ export async function getPages(): Promise<CustomPage[]> {
   const rows = await readTab(TAB);
   if (rows.length <= 1) return [];
 
-  return rows
-    .slice(1)
-    .map(rowToPage)
-    .filter((p) => Boolean(p.id) && Boolean(p.slug));
+  const seenIds = new Set<string>();
+  const seenSlugs = new Set<string>();
+  const pages: CustomPage[] = [];
+
+  for (const row of rows.slice(1)) {
+    const page = rowToPage(row);
+    if (!page.id || !page.slug) continue;
+    if (seenIds.has(page.id) || seenSlugs.has(page.slug)) continue;
+    seenIds.add(page.id);
+    seenSlugs.add(page.slug);
+    pages.push(page);
+  }
+
+  return pages;
 }
 
 export async function getPageBySlug(slug: string): Promise<CustomPage | null> {
@@ -102,6 +114,7 @@ export async function createPage(data: CreatePageInput): Promise<CustomPage> {
   const newPage: CustomPage = {
     ...data,
     id,
+    is_published: data.is_published !== undefined ? Boolean(data.is_published) : true,
     sections: validateSections(data.sections ?? []),
     settings: normalizeSettings(data.settings),
     updated_at: new Date().toISOString(),
@@ -142,10 +155,19 @@ export async function updatePage(id: string, updates: Partial<CustomPage>): Prom
 
 export async function deletePage(id: string): Promise<void> {
   const rows = await readTab(TAB);
-  const rowIndex = rows.findIndex((r, idx) => idx > 0 && r[0] === id);
-  if (rowIndex === -1) {
-    throw new Error(`Page with ID "${id}" not found`);
+  const indices: number[] = [];
+  rows.forEach((r, idx) => {
+    if (idx > 0 && (r[0] === id || r[1] === id)) {
+      indices.push(idx + 1);
+    }
+  });
+
+  if (indices.length === 0) {
+    return;
   }
 
-  await deleteRow(TAB, rowIndex + 1);
+  // Delete matching rows in reverse order to avoid shifting indices
+  for (const rowIndex of indices.reverse()) {
+    await deleteRow(TAB, rowIndex);
+  }
 }

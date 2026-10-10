@@ -70,13 +70,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-mono text-brand uppercase font-bold block mb-1">
+                  <span className="text-[11px] font-mono text-brand uppercase block mb-1">
                     {product.category_id}
                   </span>
 
                   <h2
                     className={`text-base sm:text-lg uppercase text-ink group-hover:text-brand transition leading-snug line-clamp-2 ${
-                      isArabic ? "font-arabic-heading font-bold" : "font-heading"
+                      isArabic ? "font-arabic-heading" : "font-heading"
                     }`}
                   >
                     {title}

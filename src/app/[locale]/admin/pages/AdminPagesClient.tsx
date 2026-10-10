@@ -50,7 +50,7 @@ const EMPTY_FORM: PageForm = {
   content_en: "",
   content_ar: "",
   content_fr: "",
-  is_published: false,
+  is_published: true,
   sections: [],
   settings: { ...DEFAULT_PAGE_SETTINGS },
 };
@@ -61,7 +61,15 @@ export default function AdminPagesClient({
   products,
   locale,
 }: Props) {
-  const [pages, setPages] = useState(initialPages);
+  const [pages, setPages] = useState(() => {
+    const seen = new Set<string>();
+    return initialPages.filter((p) => {
+      if (!p.id || !p.slug || seen.has(p.id) || seen.has(p.slug)) return false;
+      seen.add(p.id);
+      seen.add(p.slug);
+      return true;
+    });
+  });
   const [editing, setEditing] = useState<CustomPage | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<PageForm>(EMPTY_FORM);

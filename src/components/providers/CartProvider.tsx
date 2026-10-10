@@ -18,15 +18,17 @@ export interface CartItem {
   quantity: number;
   /** Selected size for wearables; empty/undefined for one-size products. */
   size?: string;
+  /** Selected color for wearables; empty/undefined if no color chosen. */
+  color?: string;
 }
 
 interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addItem: (product: Product, qty: number, size?: string) => boolean;
-  removeItem: (productId: string, size?: string) => void;
-  updateQuantity: (productId: string, qty: number, size?: string) => void;
+  addItem: (product: Product, qty: number, size?: string, color?: string) => boolean;
+  removeItem: (productId: string, size?: string, color?: string) => void;
+  updateQuantity: (productId: string, qty: number, size?: string, color?: string) => void;
   clearCart: () => void;
 }
 
@@ -48,9 +50,13 @@ function writeCart(items: CartItem[]) {
   window.dispatchEvent(new Event("cart-updated"));
 }
 
-/** A line is identified by product id + size (sizes create separate lines). */
-function sameLine(item: CartItem, productId: string, size?: string) {
-  return item.product.id === productId && (item.size || "") === (size || "");
+/** A line is identified by product id + size + color. */
+function sameLine(item: CartItem, productId: string, size?: string, color?: string) {
+  return (
+    item.product.id === productId &&
+    (item.size || "") === (size || "") &&
+    (item.color || "") === (color || "")
+  );
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -83,64 +89,76 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  const totalPrice = items.reduce((sum, i) => {
+    const unitPrice =
+      i.product.discount_percent && i.product.discount_percent > 0
+        ? Math.round(i.product.price * (1 - i.product.discount_percent / 100))
+        : i.product.price;
+    return sum + unitPrice * i.quantity;
+  }, 0);
 
   /**
-   * Add item to cart (one line per product+size). Returns false if the stock
+   * Add item to cart (one line per product+size+color). Returns false if the stock
    * limit would be exceeded across ALL lines of the same product.
    * NOTE: This does NOT decrement stock in the database.
    */
-  const addItem = useCallback((product: Product, qty: number, size?: string): boolean => {
-    const current = readCart();
+  const addItem = useCallback(
+    (product: Product, qty: number, size?: string, color?: string): boolean => {
+      const current = readCart();
 
-    // Stock is tracked per product, so count every line for this product.
-    const alreadyInCart = current
-      .filter((i) => i.product.id === product.id)
-      .reduce((sum, i) => sum + i.quantity, 0);
-
-    if (alreadyInCart + qty > product.quantity) {
-      return false; // Would exceed stock
-    }
-
-    const existingIdx = current.findIndex((i) => sameLine(i, product.id, size));
-
-    if (existingIdx > -1) {
-      current[existingIdx].quantity += qty;
-    } else {
-      current.push({ product, quantity: qty, size: size || "" });
-    }
-
-    writeCart(current);
-    setItems(current);
-    return true;
-  }, []);
-
-  const removeItem = useCallback((productId: string, size?: string) => {
-    const current = readCart().filter((i) => !sameLine(i, productId, size));
-    writeCart(current);
-    setItems(current);
-  }, []);
-
-  const updateQuantity = useCallback((productId: string, qty: number, size?: string) => {
-    const current = readCart();
-    const idx = current.findIndex((i) => sameLine(i, productId, size));
-    if (idx === -1) return;
-
-    if (qty <= 0) {
-      current.splice(idx, 1);
-    } else {
-      // Enforce max stock across all lines of the same product
-      const otherLines = current
-        .filter((i, n) => n !== idx && i.product.id === productId)
+      // Stock is tracked per product, so count every line for this product.
+      const alreadyInCart = current
+        .filter((i) => i.product.id === product.id)
         .reduce((sum, i) => sum + i.quantity, 0);
-      const maxQty = Math.max(0, current[idx].product.quantity - otherLines);
-      current[idx].quantity = Math.min(qty, maxQty);
-      if (current[idx].quantity === 0) current.splice(idx, 1);
-    }
 
+      if (alreadyInCart + qty > product.quantity) {
+        return false; // Would exceed stock
+      }
+
+      const existingIdx = current.findIndex((i) => sameLine(i, product.id, size, color));
+
+      if (existingIdx > -1) {
+        current[existingIdx].quantity += qty;
+      } else {
+        current.push({ product, quantity: qty, size: size || "", color: color || "" });
+      }
+
+      writeCart(current);
+      setItems(current);
+      return true;
+    },
+    [],
+  );
+
+  const removeItem = useCallback((productId: string, size?: string, color?: string) => {
+    const current = readCart().filter((i) => !sameLine(i, productId, size, color));
     writeCart(current);
     setItems(current);
   }, []);
+
+  const updateQuantity = useCallback(
+    (productId: string, qty: number, size?: string, color?: string) => {
+      const current = readCart();
+      const idx = current.findIndex((i) => sameLine(i, productId, size, color));
+      if (idx === -1) return;
+
+      if (qty <= 0) {
+        current.splice(idx, 1);
+      } else {
+        // Enforce max stock across all lines of the same product
+        const otherLines = current
+          .filter((i, n) => n !== idx && i.product.id === productId)
+          .reduce((sum, i) => sum + i.quantity, 0);
+        const maxQty = Math.max(0, current[idx].product.quantity - otherLines);
+        current[idx].quantity = Math.min(qty, maxQty);
+        if (current[idx].quantity === 0) current.splice(idx, 1);
+      }
+
+      writeCart(current);
+      setItems(current);
+    },
+    [],
+  );
 
   const clearCart = useCallback(() => {
     writeCart([]);

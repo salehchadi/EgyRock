@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -26,14 +26,20 @@ export default function CheckoutPage() {
     customer_name?: string;
     customer_phone?: string;
     shipping_address?: string;
+    governorate?: string;
     city?: string;
+    region?: string;
+    street?: string;
   }>({});
 
   const formData = {
     customer_name: formEdits.customer_name ?? user?.name ?? "",
     customer_phone: formEdits.customer_phone ?? user?.phone ?? "",
     shipping_address: formEdits.shipping_address ?? "",
-    city: formEdits.city ?? "",
+    governorate: formEdits.governorate ?? (user as any)?.governorate ?? "",
+    city: formEdits.city ?? (user as any)?.city ?? "",
+    region: formEdits.region ?? (user as any)?.region ?? "",
+    street: formEdits.street ?? (user as any)?.street ?? "",
   };
 
   // Registered users can ship to their saved address or pick another one.
@@ -54,6 +60,24 @@ export default function CheckoutPage() {
   const [receiptBase64, setReceiptBase64] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [settings, setSettings] = useState<{
+    instapay_handle: string;
+    instapay_link: string;
+    instapay_phone: string;
+  }>({
+    instapay_handle: "egyrock@instapay",
+    instapay_link: "",
+    instapay_phone: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch(() => {});
+  }, []);
 
   const finalTotal = useMemo(() => Math.max(0, totalPrice - discount), [totalPrice, discount]);
 
@@ -99,24 +123,40 @@ export default function CheckoutPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // We will compress the image to a base64 string
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
       const img = document.createElement("img");
       img.src = event.target?.result as string;
       img.onload = () => {
+        // Enforce max dimension 400px so base64 string comfortably fits within Google Sheets' 50k cell cap
+        const maxDim = 400;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 600;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx?.drawImage(img, 0, 0, w, h);
 
-        // Compress to JPEG with 0.6 quality to keep Base64 string small for Google Sheets
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+        const quality = 0.55;
+        let dataUrl = canvas.toDataURL("image/jpeg", quality);
+        if (dataUrl.length > 35000) {
+          dataUrl = canvas.toDataURL("image/jpeg", 0.35);
+        }
+        if (dataUrl.length > 35000) {
+          dataUrl = canvas.toDataURL("image/jpeg", 0.2);
+        }
         setReceiptBase64(dataUrl);
       };
     };
@@ -129,11 +169,19 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Ship to the registered address or the manually entered one.
+    // Ship to the registered address or the manually entered structured address.
     const shipping_address =
       addressChoice === "registered" && registeredAddress
         ? registeredAddress
-        : `${formData.shipping_address}, ${formData.city}`;
+        : [
+            formData.street,
+            formData.region,
+            formData.city,
+            formData.governorate,
+            formData.shipping_address,
+          ]
+            .filter(Boolean)
+            .join(", ");
 
     setLoading(true);
     setError("");
@@ -269,34 +317,69 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* Manual address fields — only when no registered address is used */}
+              {/* Manual address fields — structured breakdown */}
               {!usingRegistered && (
                 <div className="space-y-4 mt-4">
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5">
-                      {isArabic ? "العنوان التفصيلي" : "Detailed Address"}
-                    </label>
-                    <textarea
-                      required
-                      name="shipping_address"
-                      value={formData.shipping_address}
-                      onChange={handleInputChange}
-                      rows={2}
-                      className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition resize-none"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-ink mb-1.5">
+                        {isArabic ? "المحافظة" : "Governorate"}
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        name="governorate"
+                        value={formData.governorate}
+                        onChange={handleInputChange}
+                        placeholder={isArabic ? "القاهرة" : "Cairo"}
+                        className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-ink mb-1.5">
+                        {isArabic ? "المدينة / الحي" : "City / District"}
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        placeholder={isArabic ? "المعادي" : "Maadi"}
+                        className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5">
-                      {isArabic ? "المدينة / المحافظة" : "City / Governorate"}
-                    </label>
-                    <input
-                      required
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition"
-                    />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-ink mb-1.5">
+                        {isArabic ? "المنطقة" : "Region / Area"}
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        name="region"
+                        value={formData.region}
+                        onChange={handleInputChange}
+                        placeholder={isArabic ? "دجلة" : "Degla"}
+                        className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-ink mb-1.5">
+                        {isArabic ? "الشارع ورقم المبنى" : "Street & Building"}
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        name="street"
+                        value={formData.street}
+                        onChange={handleInputChange}
+                        placeholder={isArabic ? "شارع ٩، مبنى ١٢" : "St. 9, Bldg 12"}
+                        className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-2 text-sm outline-none transition"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -314,15 +397,31 @@ export default function CheckoutPage() {
                   ? "يرجى تحويل إجمالي المبلغ إلى عنوان إنستاباي التالي:"
                   : "Please transfer the exact total amount to the following InstaPay address:"}
               </p>
-              <div className="bg-black p-4 text-center border border-line">
+              <div className="bg-black p-4 text-center border border-line space-y-2">
                 <p className="font-heading text-2xl tracking-widest text-success">
-                  egyrock@instapay
+                  {settings.instapay_handle || "egyrock@instapay"}
                 </p>
-                <p className="mt-2 text-xs text-muted">
-                  {isArabic ? "رقم الهاتف المربوط: 01000000000" : "Linked Mobile: 01000000000"}
-                </p>
+                {settings.instapay_link && (
+                  <div>
+                    <a
+                      href={settings.instapay_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-3 py-1 bg-brand text-white text-xs uppercase tracking-wider font-heading hover:bg-brand-strong transition"
+                    >
+                      {isArabic ? "فتح تطبيق إنستاباي ↗" : "Open InstaPay App ↗"}
+                    </a>
+                  </div>
+                )}
+                {settings.instapay_phone && (
+                  <p className="mt-2 text-xs text-muted">
+                    {isArabic
+                      ? `رقم الهاتف المربوط: ${settings.instapay_phone}`
+                      : `Linked Mobile: ${settings.instapay_phone}`}
+                  </p>
+                )}
               </div>
-              <p className="font-bold pt-2 text-brand">
+              <p className="pt-2 text-brand">
                 {isArabic
                   ? `المبلغ المطلوب: ${finalTotal} ج.م`
                   : `Amount to send: EGP ${finalTotal}`}
@@ -398,7 +497,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value)}
-                      placeholder={isArabic ? "مثال: ROCK10" : "e.g. ROCK10"}
+                      placeholder="ROCK10"
                       className="flex-1 min-w-0 bg-canvas border-2 border-line focus:border-brand text-ink px-3 py-2 text-sm uppercase outline-none transition"
                     />
                     <button

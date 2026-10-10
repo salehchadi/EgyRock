@@ -16,9 +16,12 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [governorate, setGovernorate] = useState("");
+  const [city, setCity] = useState("");
+  const [region, setRegion] = useState("");
+  const [street, setStreet] = useState("");
   const [gender, setGender] = useState("");
-  const [age, setAge] = useState("");
+  const [birthday, setBirthday] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,10 +31,23 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      const address = [street, region, city, governorate].filter(Boolean).join(", ");
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, phone, address, gender, age }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          phone,
+          address,
+          governorate,
+          city,
+          region,
+          street,
+          gender,
+          birthday,
+        }),
       });
 
       const data = await res.json();
@@ -165,34 +181,91 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="address"
-                className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
-              >
-                {isArabic ? "عنوان السكن" : "Location Address"}
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                required
-                rows={2}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder={
-                  isArabic
-                    ? "الشارع، المنطقة، المدينة، المحافظة"
-                    : "Street, area, city, governorate"
-                }
-                className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition resize-none"
-              />
+            {/* Location fields: Governorate & City */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="governorate"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
+                >
+                  {isArabic ? "المحافظة" : "Governorate"}
+                </label>
+                <input
+                  id="governorate"
+                  name="governorate"
+                  type="text"
+                  required
+                  value={governorate}
+                  onChange={(e) => setGovernorate(e.target.value)}
+                  placeholder={isArabic ? "القاهرة" : "Cairo"}
+                  className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="city"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
+                >
+                  {isArabic ? "المدينة / الحي" : "City / District"}
+                </label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  required
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder={isArabic ? "المعادي" : "Maadi"}
+                  className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
+            </div>
+
+            {/* Region / Area & Street */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="region"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
+                >
+                  {isArabic ? "المنطقة" : "Region / Area"}
+                </label>
+                <input
+                  id="region"
+                  name="region"
+                  type="text"
+                  required
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  placeholder={isArabic ? "دجلة" : "Degla"}
+                  className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="street"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
+                >
+                  {isArabic ? "الشارع ورقم المبنى" : "Street & Building"}
+                </label>
+                <input
+                  id="street"
+                  name="street"
+                  type="text"
+                  required
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  placeholder={isArabic ? "شارع ٩، مبنى ١٢" : "St. 9, Bldg 12"}
+                  className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="gender"
-                  className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
                 >
                   {isArabic ? "الجنس" : "Gender"}
                 </label>
@@ -215,21 +288,18 @@ export default function RegisterPage() {
 
               <div>
                 <label
-                  htmlFor="age"
-                  className="block text-xs uppercase tracking-wider font-bold text-ink mb-1.5"
+                  htmlFor="birthday"
+                  className="block text-xs uppercase tracking-wider text-ink mb-1.5"
                 >
-                  {isArabic ? "العمر" : "Age"}
+                  {isArabic ? "تاريخ الميلاد" : "Birthday"}
                 </label>
                 <input
-                  id="age"
-                  name="age"
-                  type="number"
+                  id="birthday"
+                  name="birthday"
+                  type="date"
                   required
-                  min={13}
-                  max={120}
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="18"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
                   className="w-full bg-canvas border-2 border-line focus:border-brand text-ink px-4 py-3 text-sm outline-none transition"
                 />
               </div>

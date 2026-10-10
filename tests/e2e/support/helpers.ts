@@ -6,6 +6,19 @@ export type Locale = (typeof LOCALES)[number];
 export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL || "admin@egyrock.com";
 export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD || "admin123";
 
+/**
+ * Wires the browser to auto-accept the native confirm() dialogs used by the
+ * admin panel before destructive actions (delete product/category/coupon…).
+ */
+export function acceptDialogs(page: Page) {
+  page.on("dialog", (dialog) => dialog.accept());
+}
+
+/** Short unique suffix so tests that write to the live sheet don't collide. */
+export function uniqueStamp(): string {
+  return Date.now().toString(36);
+}
+
 /** Signs in through the localized credentials form and lands on the callback URL. */
 export async function signIn(
   page: Page,

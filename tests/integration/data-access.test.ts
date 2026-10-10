@@ -111,6 +111,8 @@ describe("products DAL", () => {
       images: ["/images/placeholders/egyrock-1.jpeg"],
       created_at: "2026-01-01T00:00:00.000Z",
       sizes: [],
+      colors: [],
+      discount_percent: 0,
     });
   });
 
@@ -666,9 +668,9 @@ describe("pages DAL — dynamic content pages", () => {
     expect((await getPages()).map((p) => p.id)).toEqual(["faq"]);
   });
 
-  it("throws for unknown ids on update and delete", async () => {
+  it("throws for unknown ids on update and resolves silently on delete", async () => {
     await expect(updatePage("ghost", { title_en: "x" })).rejects.toThrow(/not found/i);
-    await expect(deletePage("ghost")).rejects.toThrow(/not found/i);
+    await expect(deletePage("ghost")).resolves.toBeUndefined();
   });
 
   /* ----------------------- section-builder columns ----------------------- */

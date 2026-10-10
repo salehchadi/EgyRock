@@ -57,14 +57,21 @@ export function ProductCard({ product, locale }: ProductCardProps) {
         </Link>
 
         <div className="space-y-1.5">
-          <span className="text-[11px] font-mono text-brand uppercase font-bold tracking-wider">
-            {product.category_id}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-brand uppercase tracking-wider">
+              {product.category_id}
+            </span>
+            {Boolean(product.discount_percent && product.discount_percent > 0) && (
+              <span className="text-[10px] bg-brand text-white px-1.5 py-0.5 uppercase tracking-wider">
+                -{product.discount_percent}%
+              </span>
+            )}
+          </div>
 
           <Link href={`/catalog/${product.id}`}>
             <h3
               className={`text-lg uppercase text-ink group-hover:text-brand transition leading-snug line-clamp-2 ${
-                isArabic ? "font-arabic-heading font-bold" : "font-heading"
+                isArabic ? "font-arabic-heading" : "font-heading"
               }`}
             >
               {title}
@@ -80,9 +87,19 @@ export function ProductCard({ product, locale }: ProductCardProps) {
           <span className="text-xs text-muted block uppercase font-mono">
             {isArabic ? "السعر" : "PRICE"}
           </span>
-          <span className="font-heading text-xl text-ink">
-            {product.price} {isArabic ? "ج.م" : "EGP"}
-          </span>
+          {Boolean(product.discount_percent && product.discount_percent > 0) ? (
+            <div className="flex items-baseline gap-2">
+              <span className="font-heading text-xl text-brand">
+                {Math.round(product.price * (1 - product.discount_percent! / 100))}{" "}
+                {isArabic ? "ج.م" : "EGP"}
+              </span>
+              <span className="text-xs text-muted line-through font-mono">{product.price}</span>
+            </div>
+          ) : (
+            <span className="font-heading text-xl text-ink">
+              {product.price} {isArabic ? "ج.م" : "EGP"}
+            </span>
+          )}
         </div>
 
         <Link

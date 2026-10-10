@@ -134,10 +134,18 @@ test.describe("Storefront browsing across all three locales", () => {
     await expect(cards.first()).toBeVisible({ timeout: 20_000 });
     const unfiltered = await cards.count();
 
-    const categoryHref = await page.locator('a[href*="category="]').first().getAttribute("href");
-    test.skip(!categoryHref, "no categories seeded");
+    // The filter renders as chips (buttons) that push ?category= in the URL.
+    const allMerch = page.getByRole("button", { name: "ALL MERCH" });
+    await expect(allMerch).toBeVisible();
+    await expect(allMerch).toHaveClass(/bg-brand/);
 
-    await page.goto(categoryHref!);
+    const categoryChip = page.locator("main button").filter({ hasNotText: "ALL MERCH" }).first();
+    const chipLabel = (await categoryChip.textContent())?.trim();
+    test.skip(!chipLabel, "no categories seeded");
+
+    await categoryChip.click();
+    await expect(page).toHaveURL(/category=/, { timeout: 10_000 });
+
     const filteredCards = page.locator('a[href*="/catalog/"]');
     await expect(filteredCards.first()).toBeVisible({ timeout: 20_000 });
     const filtered = await filteredCards.count();

@@ -32,6 +32,8 @@ export async function POST(req: Request) {
       category_id,
       images,
       sizes,
+      discount_percent,
+      colors,
     } = body;
 
     if (!name_en || !category_id) {
@@ -54,6 +56,15 @@ export async function POST(req: Request) {
         ? sizes.map((s: any) => String(s).trim()).filter(Boolean)
         : typeof sizes === "string"
           ? sizes
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : [],
+      discount_percent: Math.min(100, Math.max(0, Number(discount_percent) || 0)),
+      colors: Array.isArray(colors)
+        ? colors.map((s: any) => String(s).trim()).filter(Boolean)
+        : typeof colors === "string"
+          ? colors
               .split(",")
               .map((s: string) => s.trim())
               .filter(Boolean)
